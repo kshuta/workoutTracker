@@ -2,40 +2,45 @@ package data
 
 import "time"
 
-type Plans struct {
+type Plan struct {
 	Id        int
-	name      string
-	duration  int
-	frequency int
+	Name      string
+	Duration  int
+	Frequency int
+	CreatedAt time.Time `db:"created_at"`
 }
 
-type Workouts struct {
-	Id     int
-	planId int
-	name   string
-	weekNo int
-	date   time.Time
-}
-
-type Lifts struct {
+type Workout struct {
 	Id        int
-	workoutId int
-	name      string
-	max       float64
+	PlanId    int
+	Name      string
+	WeekNo    int
+	Date      time.Time
+	CreatedAt time.Time
 }
 
-type Sets struct {
-	Id     int
-	liftId int
-	done   bool
+type Lift struct {
+	Id        int
+	WorkoutId int
+	Name      string
+	Max       float64
+	CreatedAt time.Time
 }
 
-type SetQuantities struct {
+type Set struct {
+	Id        int
+	LiftId    int
+	Done      bool
+	CreatedAt time.Time
+}
+
+type SetQuantity struct {
 	Id           int
 	SetId        int
-	repType      string
-	quantity     int
-	weight       float64
-	plannedRatio int
-	ratiotype    string
+	RepType      string
+	Quantity     int
+	Weight       float64
+	PlannedRatio int
+	Ratiotype    string
+	CreatedAt    time.Time
 }
