@@ -4,18 +4,6 @@ volumes:
     db-base:
 
 services: 
-    web:
-        build: .
-        ports:
-            - '8080:8080'
-        tty: true 
-        stdin_open: true 
-        depends_on: 
-            - db 
-        links:
-            - db 
-        env_file:
-            - .env
     db:
         image: postgres:13.3
         restart: always
