@@ -52,7 +52,8 @@ func getSQL(file string) (schema string, err error) {
 }
 
 const (
-	ErrMissingField = PlanErr("Plan struct missing field")
+	ErrMissingField    = PlanErr("Plan struct missing field")
+	ErrRetreiveFailure = PlanErr("Couldn't retreive Plan")
 )
 
 type PlanErr string
@@ -74,5 +75,10 @@ func (plan *Plan) Create() (err error) {
 	}
 	defer stmt.Close()
 	err = stmt.QueryRow(plan.Name, plan.Duration, plan.Frequency, plan.CreatedAt).Scan(&plan.Id)
+	return
+}
+
+func GetPlan(id int) (plan Plan, err error) {
+	err = db.QueryRowx("select * from plans where id=$1", id).StructScan(&plan)
 	return
 }

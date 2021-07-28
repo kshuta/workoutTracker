@@ -12,13 +12,17 @@ import (
 
 func assertError(t testing.TB, got, want error) {
 	t.Helper()
+	if got == nil {
+		t.Fatalf("error not envoked")
+	}
 	if got != want {
 		t.Fatalf("got %q, want %q", got, want)
 	}
 }
 func assertNoError(t testing.TB, err error) {
+	t.Helper()
 	if err != nil {
-		t.Fatal(err)
+		t.Fatal("error found: ", err)
 	}
 }
 
@@ -102,6 +106,25 @@ func TestPlanCreate(t *testing.T) {
 		err := plan.Create()
 		testEmptyField(t, plan, err)
 	})
+}
+
+func TestPlanRetrieve(t *testing.T) {
+	createdAt, err := time.Parse(time.RFC822, "21 Jul 28 14:11 CDT")
+	assertNoError(t, err)
+
+	plan := Plan{
+		Name:      "Retrieve test plan name",
+		Duration:  100,
+		Frequency: 80,
+		CreatedAt: createdAt,
+	}
+	plan.Create()
+
+	retreivedPlan, err := GetPlan(plan.Id)
+	assertNoError(t, err)
+	if retreivedPlan.Id != plan.Id {
+		t.Errorf("Retrieved plan with id %d, wanted plan with id %d", retreivedPlan.Id, plan.Id)
+	}
 }
 
 func testEmptyField(t *testing.T, plan Plan, err error) {
