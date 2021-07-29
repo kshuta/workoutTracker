@@ -1,12 +1,14 @@
 package data
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
@@ -34,9 +36,17 @@ func TestMain(m *testing.M) {
 
 func setUp() {
 	var err error
-	db, err = sqlx.Connect("postgres", loaclDbDSN)
+	err = godotenv.Load(".env")
 	if err != nil {
-		log.Fatalln("couldn't connect to database: ", err)
+		log.Fatalln("Failed to load environment variables")
+	}
+	if local {
+		DSN := fmt.Sprintf(dsnUrlFormat, os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("DB_URL"), os.Getenv("DB_PORT"), os.Getenv("POSTGRES_DB"))
+		db, err = sqlx.Connect("postgres", DSN)
+		check(err)
+		if err != nil {
+			log.Fatalln("couldn't connect to database: ", err)
+		}
 	}
 
 	schema, err := getSQL(initSchemaFile)
@@ -52,7 +62,9 @@ func setUp() {
 
 }
 func TestPlanCreate(t *testing.T) {
+	t.Parallel()
 	t.Run("creating plan", func(t *testing.T) {
+		t.Parallel()
 		plan := Plan{
 			Name:      "Test Plan Name",
 			Duration:  4,
@@ -68,6 +80,7 @@ func TestPlanCreate(t *testing.T) {
 	})
 
 	t.Run("creating plan with no name", func(t *testing.T) {
+		t.Parallel()
 		plan := Plan{
 			Duration:  4,
 			Frequency: 3,
@@ -78,6 +91,7 @@ func TestPlanCreate(t *testing.T) {
 	})
 
 	t.Run("creating plan with no duration", func(t *testing.T) {
+		t.Parallel()
 		plan := Plan{
 			Name:      "Test Plan Name",
 			Frequency: 3,
@@ -88,6 +102,7 @@ func TestPlanCreate(t *testing.T) {
 	})
 
 	t.Run("creating plan with no frequency", func(t *testing.T) {
+		t.Parallel()
 		plan := Plan{
 			Name:      "Test Plan Name",
 			Duration:  4,
@@ -98,6 +113,7 @@ func TestPlanCreate(t *testing.T) {
 	})
 
 	t.Run("creating plan with no CreatedAt", func(t *testing.T) {
+		t.Parallel()
 		plan := Plan{
 			Name:      "Test Plan Name",
 			Duration:  4,
@@ -108,7 +124,16 @@ func TestPlanCreate(t *testing.T) {
 	})
 }
 
+func testEmptyField(t *testing.T, plan Plan, err error) {
+	t.Helper()
+	assertError(t, err, ErrMissingField)
+	if plan.Id != 0 {
+		t.Errorf("error: insertion did not fail")
+	}
+}
+
 func TestPlanRetrieve(t *testing.T) {
+	t.Parallel()
 	createdAt, err := time.Parse(time.RFC822, "21 Jul 28 14:11 CDT")
 	assertNoError(t, err)
 
@@ -127,10 +152,28 @@ func TestPlanRetrieve(t *testing.T) {
 	}
 }
 
-func testEmptyField(t *testing.T, plan Plan, err error) {
-	t.Helper()
-	assertError(t, err, ErrMissingField)
-	if plan.Id != 0 {
-		t.Errorf("error: insertion did not fail")
+func TestPlanUpdate(t *testing.T) {
+	t.Parallel()
+	plan := Plan{
+		Name:      "pre-update test plan name",
+		Duration:  111,
+		Frequency: 88,
+		CreatedAt: time.Now(),
 	}
+	plan.Create()
+
+	preUpdatedPlan, err := GetPlan(plan.Id)
+	assertNoError(t, err)
+
+	preUpdatedPlan.Name = "Updated test plan name"
+	err = preUpdatedPlan.Update()
+	assertNoError(t, err)
+
+	updatedPlan, err := GetPlan(plan.Id)
+	assertNoError(t, err)
+
+	if updatedPlan.Name != "Updated test plan name" {
+		t.Errorf("field not updated")
+	}
+
 }
