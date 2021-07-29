@@ -99,3 +99,8 @@ func (plan *Plan) Update() (err error) {
 	_, err = db.Exec("update plans set name = $2, duration = $3, frequency = $4 where id = $1", plan.Id, plan.Name, plan.Duration, plan.Frequency)
 	return
 }
+
+func (plan *Plan) Delete() (err error) {
+	_, err = db.Exec("delete from plans where id = $1", plan.Id)
+	return
+}

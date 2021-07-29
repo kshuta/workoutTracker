@@ -12,6 +12,9 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// Tests if the given error matches the expecte error.
+// if identical errors are passed in, the function can be used
+// to test if an error exists
 func assertError(t testing.TB, got, want error) {
 	t.Helper()
 	if got == nil {
@@ -175,5 +178,27 @@ func TestPlanUpdate(t *testing.T) {
 	if updatedPlan.Name != "Updated test plan name" {
 		t.Errorf("field not updated")
 	}
+}
 
+func TestPlanDelete(t *testing.T) {
+	t.Parallel()
+	plan := Plan{
+		Name:      "pre-update test plan name",
+		Duration:  111,
+		Frequency: 88,
+		CreatedAt: time.Now(),
+	}
+	plan.Create()
+
+	toDeletePlan, err := GetPlan(plan.Id)
+	assertNoError(t, err)
+
+	toDeletePlan.Delete()
+
+	deletedPlan, err := GetPlan(toDeletePlan.Id)
+	assertError(t, err, err)
+
+	if deletedPlan.Id != 0 {
+		t.Error("Plan has not been deleted after delete function")
+	}
 }
