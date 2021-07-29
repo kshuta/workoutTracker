@@ -11,8 +11,8 @@ type Plan struct {
 }
 
 const (
-	ErrMissingField    = PlanErr("Plan struct missing field")
-	ErrRetreiveFailure = PlanErr("Couldn't retreive Plan")
+	ErrPlanMissingField    = PlanErr("Plan struct missing field")
+	ErrPlanRetreiveFailure = PlanErr("Couldn't retreive Plan")
 )
 
 type PlanErr string
@@ -24,7 +24,7 @@ func (e PlanErr) Error() string {
 func (plan *Plan) Create() (err error) {
 	// check for empty fields
 	if plan.Name == "" || plan.Duration == 0 || plan.Frequency == 0 || plan.CreatedAt.IsZero() {
-		return ErrMissingField
+		return ErrPlanMissingField
 	}
 
 	statement := "insert into plans (name, duration, frequency, created_at) values ($1, $2, $3, $4) returning id"

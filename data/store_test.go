@@ -54,7 +54,7 @@ func assertError(t testing.TB, got, want error) {
 		t.Fatalf("error not envoked")
 	}
 	if got != want {
-		t.Fatalf("got %q, want %q", got, want)
+		t.Fatalf("expected error %q, got %q", want, got)
 	}
 }
 func assertNoError(t testing.TB, err error) {

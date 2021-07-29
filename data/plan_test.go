@@ -31,7 +31,7 @@ func TestPlanCreate(t *testing.T) {
 			CreatedAt: time.Now(),
 		}
 		err := plan.Create()
-		testEmptyField(t, plan, err)
+		testPlanEmptyField(t, plan, err)
 	})
 
 	t.Run("creating plan with no duration", func(t *testing.T) {
@@ -42,7 +42,7 @@ func TestPlanCreate(t *testing.T) {
 			CreatedAt: time.Now(),
 		}
 		err := plan.Create()
-		testEmptyField(t, plan, err)
+		testPlanEmptyField(t, plan, err)
 	})
 
 	t.Run("creating plan with no frequency", func(t *testing.T) {
@@ -53,7 +53,7 @@ func TestPlanCreate(t *testing.T) {
 			CreatedAt: time.Now(),
 		}
 		err := plan.Create()
-		testEmptyField(t, plan, err)
+		testPlanEmptyField(t, plan, err)
 	})
 
 	t.Run("creating plan with no CreatedAt", func(t *testing.T) {
@@ -64,13 +64,13 @@ func TestPlanCreate(t *testing.T) {
 			Frequency: 3,
 		}
 		err := plan.Create()
-		testEmptyField(t, plan, err)
+		testPlanEmptyField(t, plan, err)
 	})
 }
 
-func testEmptyField(t *testing.T, plan Plan, err error) {
+func testPlanEmptyField(t *testing.T, plan Plan, err error) {
 	t.Helper()
-	assertError(t, err, ErrMissingField)
+	assertError(t, err, ErrPlanMissingField)
 	if plan.Id != 0 {
 		t.Errorf("error: insertion did not fail")
 	}
@@ -92,7 +92,7 @@ func TestPlanRetrieve(t *testing.T) {
 	retreivedPlan, err := GetPlan(plan.Id)
 	assertNoError(t, err)
 	if retreivedPlan.Id != plan.Id {
-		t.Errorf("Retrieved plan with id %d, wanted plan with id %d", retreivedPlan.Id, plan.Id)
+		t.Errorf("wrong workout retrieved: retrieved plan with id %d, wanted plan with id %d", retreivedPlan.Id, plan.Id)
 	}
 }
 

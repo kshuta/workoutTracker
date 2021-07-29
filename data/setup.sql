@@ -1,8 +1,8 @@
-drop table setquantities if exists;
-drop table sets cascade if exists;
-drop table lifts cascade if exists;
-drop table workouts cascade if exists;
-drop table plans cascade if exists;
+drop table if exists setquantities;
+drop table if exists sets cascade;
+drop table if exists lifts cascade;
+drop table if exists workouts cascade;
+drop table if exists plans cascade;
 
 create table plans(
     id serial primary key,
