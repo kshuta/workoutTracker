@@ -2,11 +2,10 @@ package data
 
 import "time"
 
-type Workout struct {
+type Lift struct {
 	Id        int
-	PlanId    int
+	WorkoutId int
 	Name      string
-	WeekNo    int
-	Date      time.Time
+	Max       float64
 	CreatedAt time.Time
 }
