@@ -43,3 +43,8 @@ func GetWorkout(id int) (workout Workout, err error) {
 	err = db.QueryRowx("select * from workouts where id=$1", id).StructScan(&workout)
 	return
 }
+
+func (workout *Workout) Update() (err error) {
+	_, err = db.Exec("update workouts set name = $2, week_no= $3, date = $4, plan_id = $5 where id = $1", workout.Id, workout.Name, workout.WeekNo, workout.Date, workout.PlanId)
+	return
+}
