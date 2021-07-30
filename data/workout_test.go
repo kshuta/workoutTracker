@@ -117,6 +117,21 @@ func TestWorkoutUpdate(t *testing.T) {
 	})
 }
 
+func TestWorkoutDelete(t *testing.T) {
+	t.Parallel()
+	t.Run("deleting workout", func(t *testing.T) {
+		workout, err := getWorkoutTestStruct("test plan name", "to be deleted workout name")
+		assertNoError(t, err)
+		err = workout.Create()
+		assertNoError(t, err)
+
+		workout.Delete()
+
+		_, err = GetWorkout(workout.Id)
+		assertError(t, err, err)
+	})
+}
+
 func getWorkoutTestStruct(planName, workoutName string) (workout *Workout, err error) {
 	plan := &Plan{
 		Name:      planName,
