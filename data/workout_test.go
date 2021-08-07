@@ -20,14 +20,6 @@ func TestWorkoutCreate(t *testing.T) {
 
 	})
 
-	t.Run("creating workout without PlanId", func(t *testing.T) {
-		workout, err := getWorkoutTestStruct("workout test plan name", "Test workout")
-		assertNoError(t, err)
-		workout.PlanId = 0
-		err = workout.Create()
-		testWorkoutEmptyField(t, *workout, err)
-	})
-
 	t.Run("creating workout without Name", func(t *testing.T) {
 		workout, err := getWorkoutTestStruct("workout test plan name", "Test workout")
 		assertNoError(t, err)
@@ -133,23 +125,11 @@ func TestWorkoutDelete(t *testing.T) {
 }
 
 func getWorkoutTestStruct(planName, workoutName string) (workout *Workout, err error) {
-	plan := &Plan{
-		Name:      planName,
-		Duration:  4,
-		Frequency: 3,
-		CreatedAt: time.Now(),
-	}
-	err = plan.Create()
-	if err != nil {
-		return
-	}
-
 	workout = &Workout{
 		Name:      workoutName,
 		WeekNo:    1,
 		Date:      time.Now(),
 		CreatedAt: time.Now(),
-		PlanId:    plan.Id,
 	}
 	return
 }

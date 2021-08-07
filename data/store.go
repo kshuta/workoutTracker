@@ -31,7 +31,7 @@ func init() {
 	var err error
 	err = godotenv.Load(".env")
 	if err != nil {
-		log.Fatalln("Failed to load environment variables")
+		log.Fatalln("Failed to load environment variables: ", err)
 	}
 	if local {
 		DSN := fmt.Sprintf(dsnUrlFormat, os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("DB_URL"), os.Getenv("DB_PORT"), os.Getenv("POSTGRES_DB"))
