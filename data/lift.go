@@ -35,3 +35,8 @@ func (lift *Lift) Create() (err error) {
 	err = stmt.QueryRow(lift.Name, lift.Max, lift.CreatedAt).Scan(&lift.Id)
 	return
 }
+
+func GetLift(id int) (lift Lift, err error) {
+	err = db.QueryRowx("select * from lifts where id = $1", id).StructScan(&lift)
+	return
+}

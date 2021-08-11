@@ -44,6 +44,27 @@ func liftIsCreated(t *testing.T, lift Lift, err error) {
 	}
 }
 
+func TestLiftRetrieve(t *testing.T) {
+	t.Parallel()
+	t.Run("retrieve lift", func(t *testing.T) {
+		lift := getTestLift("retrieve test lift name")
+		err := lift.Create()
+		liftIsCreated(t, *lift, err)
+
+		retrievedLift, err := GetLift(lift.Id)
+		assertNoError(t, err)
+		if retrievedLift.Id != lift.Id {
+			t.Errorf("Expected lift with id %d, got lift with id %d", lift.Id, retrievedLift.Id)
+		}
+	})
+
+	t.Run("retrieve lift that doesn't exist", func(t *testing.T) {
+		_, err := GetLift(-1)
+		assertError(t, err, err)
+	})
+
+}
+
 func getTestLift(liftName string) (lift *Lift) {
 	lift = &Lift{
 		Name:      liftName,
