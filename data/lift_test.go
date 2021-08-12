@@ -47,6 +47,7 @@ func liftIsCreated(t *testing.T, lift Lift, err error) {
 func TestLiftRetrieve(t *testing.T) {
 	t.Parallel()
 	t.Run("retrieve lift", func(t *testing.T) {
+		t.Parallel()
 		lift := getTestLift("retrieve test lift name")
 		err := lift.Create()
 		liftIsCreated(t, *lift, err)
@@ -59,10 +60,32 @@ func TestLiftRetrieve(t *testing.T) {
 	})
 
 	t.Run("retrieve lift that doesn't exist", func(t *testing.T) {
+		t.Parallel()
 		_, err := GetLift(-1)
 		assertError(t, err, err)
 	})
 
+}
+
+func TestLiftUpdate(t *testing.T) {
+	t.Parallel()
+	beforeUpdate := "not updated"
+	lift := getTestLift(beforeUpdate)
+	err := lift.Create()
+	liftIsCreated(t, *lift, err)
+
+	afterUpdate := "updated"
+	lift.Name = afterUpdate
+	err = lift.Update()
+
+	assertNoError(t, err)
+
+	retrievedLift, err := GetLift(lift.Id)
+	assertNoError(t, err)
+
+	if retrievedLift.Name != afterUpdate {
+		t.Error("error: name not updated")
+	}
 }
 
 func getTestLift(liftName string) (lift *Lift) {

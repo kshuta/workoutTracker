@@ -40,3 +40,8 @@ func GetLift(id int) (lift Lift, err error) {
 	err = db.QueryRowx("select * from lifts where id = $1", id).StructScan(&lift)
 	return
 }
+
+func (lift *Lift) Update() (err error) {
+	_, err = db.Exec("update lifts set name = $2, max = $3 where id = $1", lift.Id, lift.Name, lift.Max)
+	return
+}
