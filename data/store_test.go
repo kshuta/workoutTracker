@@ -45,7 +45,7 @@ func setUp() {
 
 }
 
-// Tests if the given error matches the expecte error.
+// Tests if the given error matches the expected error.
 // if identical errors are passed in, the function can be used
 // to test if an error exists
 func assertError(t testing.TB, got, want error) {
@@ -53,10 +53,13 @@ func assertError(t testing.TB, got, want error) {
 	if got == nil {
 		t.Fatalf("error not envoked")
 	}
+
 	if got != want {
 		t.Fatalf("expected error %q, got %q", want, got)
 	}
 }
+
+// checks that the given error is nil
 func assertNoError(t testing.TB, err error) {
 	t.Helper()
 	if err != nil {

@@ -88,6 +88,19 @@ func TestLiftUpdate(t *testing.T) {
 	}
 }
 
+func TestLiftDelete(t *testing.T) {
+	t.Parallel()
+	delLift := getTestLift("lift soon to be deleted")
+	err := delLift.Create()
+	liftIsCreated(t, *delLift, err)
+
+	err = delLift.Delete()
+	assertNoError(t, err)
+
+	_, err = GetLift(delLift.Id)
+	assertError(t, err, err)
+}
+
 func getTestLift(liftName string) (lift *Lift) {
 	lift = &Lift{
 		Name:      liftName,

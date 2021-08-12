@@ -45,3 +45,8 @@ func (lift *Lift) Update() (err error) {
 	_, err = db.Exec("update lifts set name = $2, max = $3 where id = $1", lift.Id, lift.Name, lift.Max)
 	return
 }
+
+func (lift *Lift) Delete() (err error) {
+	_, err = db.Exec("delete from lifts where id = $1", lift.Id)
+	return
+}
