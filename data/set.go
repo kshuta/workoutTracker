@@ -45,3 +45,8 @@ func (set *Set) Create() (err error) {
 	err = stmt.QueryRow(set.LiftId, set.Done, set.CreatedAt).Scan(&set.Id)
 	return
 }
+
+func GetSet(id int) (set Set, err error) {
+	err = db.QueryRowx("select * from sets where id = $1", id).StructScan(&set)
+	return
+}
