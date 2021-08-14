@@ -55,3 +55,8 @@ func (set *Set) Update() (err error) {
 	_, err = db.Exec("update sets set done = $1", set.Done)
 	return
 }
+
+func (set *Set) Delete() (err error) {
+	_, err = db.Exec("delete from sets where id = $1", set.Id)
+	return
+}

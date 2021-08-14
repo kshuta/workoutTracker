@@ -74,6 +74,19 @@ func TestSetUpdate(t *testing.T) {
 	}
 }
 
+func TestSetDelete(t *testing.T) {
+	set, err := getTestSet()
+	assertNoError(t, err)
+	set.Create()
+	setIsCreated(t, *set, err)
+
+	set.Delete()
+
+	_, err = GetSet(set.Id)
+	assertError(t, err, err)
+
+}
+
 // returns set struct with populated fields
 // creates arbitrary lift for parent
 func getTestSet() (set *Set, err error) {
