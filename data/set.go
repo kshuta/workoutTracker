@@ -9,19 +9,34 @@ type Set struct {
 	CreatedAt time.Time `db:"created_at"`
 }
 
+// SetId, Reptype, Reptype and createdAt are necessary fields
 type SetQuantity struct {
 	Id           int
-	SetId        int    `db:"set_id"`
-	RepType      string `db:"rep_type"`
+	SetId        int     `db:"set_id"`
+	Reptype      RepType `db:"rep_type"`
 	Quantity     int
 	Weight       float64
 	PlannedRatio int       `db:"planned_ratio"`
-	Ratiotype    string    `db:"ratio_type"`
+	Ratiotype    RatioType `db:"ratio_type"`
 	CreatedAt    time.Time `db:"created_at"`
 }
 
+type RepType int64
+type RatioType int64
+
 const (
-	ErrSetMissingField = SetErr("Set struct is missing field")
+	Duration RepType = iota
+	Count    RepType = iota
+)
+
+const (
+	REM        RatioType = iota
+	Percentage RatioType = iota
+)
+
+const (
+	ErrSetMissingField         = SetErr("Set struct is missing field")
+	ErrSetQuantityMissingField = SetErr("Set Quantity struct is missing field")
 )
 
 type SetErr string
@@ -58,5 +73,21 @@ func (set *Set) Update() (err error) {
 
 func (set *Set) Delete() (err error) {
 	_, err = db.Exec("delete from sets where id = $1", set.Id)
+	return
+}
+
+func (sq *SetQuantity) Create() (err error) {
+	if sq.SetId == 0 || sq.Reptype == 0 || sq.CreatedAt.IsZero() {
+		return ErrSetQuantityMissingField
+	}
+	statement := "insert into setquantities (set_id, rep_type, quantity, weight, planned_ratio, ratio_type, created_at) values ($1, $2, $3, $4, $5, $6, $7) returning id"
+
+	stmt, err := db.Prepare(statement)
+	if err != nil {
+		return
+	}
+
+	stmt.QueryRow(sq.SetId, sq.Reptype, sq.Quantity, sq.Weight, sq.PlannedRatio, sq.Ratiotype, sq.CreatedAt).Scan(&sq.Id)
+
 	return
 }

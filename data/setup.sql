@@ -29,7 +29,7 @@ create table sets (
 
 create table setquantities (
     id serial primary key,
-    repType varchar(255) not null,
+    rep_type varchar(255) not null,
     quantity integer not null,
     weight real not null,
     planned_ratio int,
