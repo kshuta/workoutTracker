@@ -50,3 +50,8 @@ func GetSet(id int) (set Set, err error) {
 	err = db.QueryRowx("select * from sets where id = $1", id).StructScan(&set)
 	return
 }
+
+func (set *Set) Update() (err error) {
+	_, err = db.Exec("update sets set done = $1", set.Done)
+	return
+}

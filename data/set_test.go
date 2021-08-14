@@ -9,7 +9,7 @@ func TestSetCreate(t *testing.T) {
 	t.Parallel()
 	t.Run("create set", func(t *testing.T) {
 		t.Parallel()
-		set, err := getTestSet("Test set name")
+		set, err := getTestSet()
 		assertNoError(t, err)
 		err = set.Create()
 		setIsCreated(t, *set, err)
@@ -17,7 +17,7 @@ func TestSetCreate(t *testing.T) {
 
 	t.Run("create set without lift_id", func(t *testing.T) {
 		t.Parallel()
-		set, err := getTestSet("test set name")
+		set, err := getTestSet()
 		assertNoError(t, err)
 		set.LiftId = 0
 		err = set.Create()
@@ -26,7 +26,7 @@ func TestSetCreate(t *testing.T) {
 
 	t.Run("create set without created_at", func(t *testing.T) {
 		t.Parallel()
-		set, err := getTestSet("test set name")
+		set, err := getTestSet()
 		assertNoError(t, err)
 		set.CreatedAt = time.Time{}
 		err = set.Create()
@@ -37,7 +37,7 @@ func TestSetCreate(t *testing.T) {
 func TestSetRetrieve(t *testing.T) {
 	t.Parallel()
 	t.Run("retrieve set", func(t *testing.T) {
-		set, err := getTestSet("test set name")
+		set, err := getTestSet()
 		assertNoError(t, err)
 		err = set.Create()
 		setIsCreated(t, *set, err)
@@ -54,12 +54,29 @@ func TestSetRetrieve(t *testing.T) {
 		_, err := GetSet(-1)
 		assertError(t, err, err)
 	})
+}
 
+func TestSetUpdate(t *testing.T) {
+	set, err := getTestSet()
+	assertNoError(t, err)
+
+	err = set.Create()
+	setIsCreated(t, *set, err)
+
+	set.Done = true
+	err = set.Update()
+	assertNoError(t, err)
+
+	retrievedSet, err := GetSet(set.Id)
+	assertNoError(t, err)
+	if retrievedSet.Done != true {
+		t.Error("update failed: expected done to be true")
+	}
 }
 
 // returns set struct with populated fields
 // creates arbitrary lift for parent
-func getTestSet(setName string) (set *Set, err error) {
+func getTestSet() (set *Set, err error) {
 	lift := getTestLift("lift for set test")
 	err = lift.Create()
 	if err != nil {
