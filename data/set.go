@@ -4,18 +4,44 @@ import "time"
 
 type Set struct {
 	Id        int
-	LiftId    int
+	LiftId    int `db:"lift_id"`
 	Done      bool
-	CreatedAt time.Time
+	CreatedAt time.Time `db:"created_at"`
 }
 
 type SetQuantity struct {
 	Id           int
-	SetId        int
-	RepType      string
+	SetId        int    `db:"set_id"`
+	RepType      string `db:"rep_type"`
 	Quantity     int
 	Weight       float64
-	PlannedRatio int
-	Ratiotype    string
-	CreatedAt    time.Time
+	PlannedRatio int       `db:"planned_ratio"`
+	Ratiotype    string    `db:"ratio_type"`
+	CreatedAt    time.Time `db:"created_at"`
+}
+
+const (
+	ErrSetMissingField = SetErr("Set struct is missing field")
+)
+
+type SetErr string
+
+func (err SetErr) Error() string {
+	return string(err)
+}
+
+func (set *Set) Create() (err error) {
+	if set.LiftId == 0 || set.CreatedAt.IsZero() {
+		return ErrSetMissingField
+	}
+
+	statement := "insert into sets (lift_id, done, created_at) values ($1, $2, $3) returning id"
+
+	stmt, err := db.Prepare(statement)
+	if err != nil {
+		return
+	}
+
+	err = stmt.QueryRow(set.LiftId, set.Done, set.CreatedAt).Scan(&set.Id)
+	return
 }

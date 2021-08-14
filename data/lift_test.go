@@ -101,6 +101,7 @@ func TestLiftDelete(t *testing.T) {
 	assertError(t, err, err)
 }
 
+// returns lift struct with populated fields
 func getTestLift(liftName string) (lift *Lift) {
 	lift = &Lift{
 		Name:      liftName,

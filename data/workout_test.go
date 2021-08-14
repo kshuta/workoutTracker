@@ -9,10 +9,9 @@ func TestWorkoutCreate(t *testing.T) {
 	t.Parallel()
 
 	t.Run("creating workout", func(t *testing.T) {
-		workout, err := getWorkoutTestStruct("Workout test plan name", "Test workout")
-		assertNoError(t, err)
+		workout := getTestWorkout("Workout test plan name", "Test workout")
 
-		err = workout.Create()
+		err := workout.Create()
 		assertNoError(t, err)
 		if workout.Id == 0 {
 			t.Error("insertion failed: workout id is still 0")
@@ -21,34 +20,30 @@ func TestWorkoutCreate(t *testing.T) {
 	})
 
 	t.Run("creating workout without Name", func(t *testing.T) {
-		workout, err := getWorkoutTestStruct("workout test plan name", "Test workout")
-		assertNoError(t, err)
+		workout := getTestWorkout("workout test plan name", "Test workout")
 		workout.Name = ""
-		err = workout.Create()
+		err := workout.Create()
 		testWorkoutEmptyField(t, *workout, err)
 	})
 
 	t.Run("creating workout without WeekNo", func(t *testing.T) {
-		workout, err := getWorkoutTestStruct("workout test plan name", "Test workout")
-		assertNoError(t, err)
+		workout := getTestWorkout("workout test plan name", "Test workout")
 		workout.WeekNo = 0
-		err = workout.Create()
+		err := workout.Create()
 		testWorkoutEmptyField(t, *workout, err)
 	})
 
 	t.Run("creating workout without Date", func(t *testing.T) {
-		workout, err := getWorkoutTestStruct("workout test plan name", "Test workout")
-		assertNoError(t, err)
+		workout := getTestWorkout("workout test plan name", "Test workout")
 		workout.Date = time.Time{}
-		err = workout.Create()
+		err := workout.Create()
 		testWorkoutEmptyField(t, *workout, err)
 	})
 
 	t.Run("creating workout without CreatedAt", func(t *testing.T) {
-		workout, err := getWorkoutTestStruct("workout test plan name", "Test workout")
-		assertNoError(t, err)
+		workout := getTestWorkout("workout test plan name", "Test workout")
 		workout.CreatedAt = time.Time{}
-		err = workout.Create()
+		err := workout.Create()
 		testWorkoutEmptyField(t, *workout, err)
 	})
 }
@@ -68,10 +63,9 @@ func TestWorkoutRetrieve(t *testing.T) {
 
 	t.Run("retrieving workout", func(t *testing.T) {
 		t.Parallel()
-		workout, err := getWorkoutTestStruct("test plan", "workout retrieve test")
-		assertNoError(t, err)
+		workout := getTestWorkout("test plan", "workout retrieve test")
 
-		err = workout.Create()
+		err := workout.Create()
 		assertNoError(t, err)
 
 		retreivedWorkout, err := GetWorkout(workout.Id)
@@ -91,9 +85,8 @@ func TestWorkoutRetrieve(t *testing.T) {
 func TestWorkoutUpdate(t *testing.T) {
 	t.Parallel()
 	t.Run("updating field", func(t *testing.T) {
-		workout, err := getWorkoutTestStruct("test plan name", "before update workout name")
-		assertNoError(t, err)
-		err = workout.Create()
+		workout := getTestWorkout("test plan name", "before update workout name")
+		err := workout.Create()
 		assertNoError(t, err)
 
 		updatedName := "updated workout name"
@@ -112,9 +105,8 @@ func TestWorkoutUpdate(t *testing.T) {
 func TestWorkoutDelete(t *testing.T) {
 	t.Parallel()
 	t.Run("deleting workout", func(t *testing.T) {
-		workout, err := getWorkoutTestStruct("test plan name", "to be deleted workout name")
-		assertNoError(t, err)
-		err = workout.Create()
+		workout := getTestWorkout("test plan name", "to be deleted workout name")
+		err := workout.Create()
 		assertNoError(t, err)
 
 		workout.Delete()
@@ -124,7 +116,8 @@ func TestWorkoutDelete(t *testing.T) {
 	})
 }
 
-func getWorkoutTestStruct(planName, workoutName string) (workout *Workout, err error) {
+// returns workout struct with populated fields
+func getTestWorkout(planName, workoutName string) (workout *Workout) {
 	workout = &Workout{
 		Name:      workoutName,
 		WeekNo:    1,
