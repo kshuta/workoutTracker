@@ -9,7 +9,7 @@ func TestWorkoutCreate(t *testing.T) {
 	t.Parallel()
 
 	t.Run("creating workout", func(t *testing.T) {
-		workout := getTestWorkout("Workout test plan name", "Test workout")
+		workout := getTestWorkout("Test workout")
 
 		err := workout.Create()
 		assertNoError(t, err)
@@ -20,28 +20,28 @@ func TestWorkoutCreate(t *testing.T) {
 	})
 
 	t.Run("creating workout without Name", func(t *testing.T) {
-		workout := getTestWorkout("workout test plan name", "Test workout")
+		workout := getTestWorkout("Test workout")
 		workout.Name = ""
 		err := workout.Create()
 		testWorkoutEmptyField(t, *workout, err)
 	})
 
 	t.Run("creating workout without WeekNo", func(t *testing.T) {
-		workout := getTestWorkout("workout test plan name", "Test workout")
+		workout := getTestWorkout("Test workout")
 		workout.WeekNo = 0
 		err := workout.Create()
 		testWorkoutEmptyField(t, *workout, err)
 	})
 
 	t.Run("creating workout without Date", func(t *testing.T) {
-		workout := getTestWorkout("workout test plan name", "Test workout")
+		workout := getTestWorkout("Test workout")
 		workout.Date = time.Time{}
 		err := workout.Create()
 		testWorkoutEmptyField(t, *workout, err)
 	})
 
 	t.Run("creating workout without CreatedAt", func(t *testing.T) {
-		workout := getTestWorkout("workout test plan name", "Test workout")
+		workout := getTestWorkout("Test workout")
 		workout.CreatedAt = time.Time{}
 		err := workout.Create()
 		testWorkoutEmptyField(t, *workout, err)
@@ -63,7 +63,7 @@ func TestWorkoutRetrieve(t *testing.T) {
 
 	t.Run("retrieving workout", func(t *testing.T) {
 		t.Parallel()
-		workout := getTestWorkout("test plan", "workout retrieve test")
+		workout := getTestWorkout("workout retrieve test")
 
 		err := workout.Create()
 		assertNoError(t, err)
@@ -85,7 +85,7 @@ func TestWorkoutRetrieve(t *testing.T) {
 func TestWorkoutUpdate(t *testing.T) {
 	t.Parallel()
 	t.Run("updating field", func(t *testing.T) {
-		workout := getTestWorkout("test plan name", "before update workout name")
+		workout := getTestWorkout("before update workout name")
 		err := workout.Create()
 		assertNoError(t, err)
 
@@ -105,7 +105,7 @@ func TestWorkoutUpdate(t *testing.T) {
 func TestWorkoutDelete(t *testing.T) {
 	t.Parallel()
 	t.Run("deleting workout", func(t *testing.T) {
-		workout := getTestWorkout("test plan name", "to be deleted workout name")
+		workout := getTestWorkout("to be deleted workout name")
 		err := workout.Create()
 		assertNoError(t, err)
 
@@ -117,7 +117,7 @@ func TestWorkoutDelete(t *testing.T) {
 }
 
 // returns workout struct with populated fields
-func getTestWorkout(planName, workoutName string) (workout *Workout) {
+func getTestWorkout(workoutName string) (workout *Workout) {
 	workout = &Workout{
 		Name:      workoutName,
 		WeekNo:    1,

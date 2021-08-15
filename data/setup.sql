@@ -30,8 +30,8 @@ create table sets (
 create table setquantities (
     id serial primary key,
     rep_type varchar(255) not null,
-    quantity integer not null,
-    weight real not null,
+    quantity integer,
+    weight real, 
     planned_ratio int,
     ratio_type varchar(255),
     set_id integer references sets(id),

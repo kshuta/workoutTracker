@@ -170,6 +170,28 @@ func TestSetquantityRetrieve(t *testing.T) {
 
 }
 
+func TestSetQuantityUpdate(t *testing.T) {
+	t.Parallel()
+	set, err := getTestSet()
+	assertNoError(t, err)
+	err = set.Create()
+	setIsCreated(t, *set, err)
+	sq := getTestSetQuantity(set)
+	err = sq.Create()
+	setQuantityIscreated(t, *sq, err)
+
+	updatedWeight := 55.5
+	sq.Weight = updatedWeight
+	sq.Update()
+
+	retrievedSq, err := GetSetQuantity(sq.Id)
+	assertNoError(t, err)
+
+	if retrievedSq.Weight != updatedWeight {
+		t.Error("update error: field not updated")
+	}
+}
+
 // returns set struct with populated fields
 // creates arbitrary lift for parent
 func getTestSet() (set *Set, err error) {
