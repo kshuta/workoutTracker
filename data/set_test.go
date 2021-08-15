@@ -99,10 +99,7 @@ func TestSetQuantityCreate(t *testing.T) {
 		sq := getTestSetQuantity(set)
 
 		err = sq.Create()
-		assertNoError(t, err)
-		if sq.Id == 0 {
-			t.Error("insertion failed: set quantity's id is still 0")
-		}
+		setQuantityIscreated(t, *sq, err)
 	})
 
 	t.Run("create SetQuantity without foreign key", func(t *testing.T) {
@@ -141,8 +138,36 @@ func TestSetQuantityCreate(t *testing.T) {
 		sq := getTestSetQuantity(set)
 		sq.Weight = 0
 		err = sq.Create()
-		assertNoError(t, err)
+		setQuantityIscreated(t, *sq, err)
 	})
+}
+
+func TestSetquantityRetrieve(t *testing.T) {
+	t.Parallel()
+	t.Run("retrieving SetQuantity", func(t *testing.T) {
+		// setup set quantity
+		t.Parallel()
+		set, err := getTestSet()
+		assertNoError(t, err)
+		err = set.Create()
+		setIsCreated(t, *set, err)
+		sq := getTestSetQuantity(set)
+		err = sq.Create()
+		setQuantityIscreated(t, *sq, err)
+
+		retrievedSq, err := GetSetQuantity(sq.Id)
+		assertNoError(t, err)
+
+		if retrievedSq.Id != sq.Id {
+			t.Errorf("expected SetQuantity with id %d, got SetQuantity with id %d", sq.Id, retrievedSq.Id)
+		}
+	})
+	t.Run("retrieving SetQuantity that doesn't exist", func(t *testing.T) {
+		t.Parallel()
+		_, err := GetSetQuantity(-1)
+		assertError(t, err, err)
+	})
+
 }
 
 // returns set struct with populated fields
@@ -180,6 +205,13 @@ func getTestSetQuantity(set *Set) (sq *SetQuantity) {
 func setIsCreated(t *testing.T, set Set, err error) {
 	assertNoError(t, err)
 	if set.Id == 0 {
-		t.Error("Insersion failed: lift id is still 0")
+		t.Error("Insersion failed: set id is still 0")
+	}
+}
+
+func setQuantityIscreated(t *testing.T, sq SetQuantity, err error) {
+	assertNoError(t, err)
+	if sq.Id == 0 {
+		t.Error("Insersion failed: SetQuantity id is still 0")
 	}
 }

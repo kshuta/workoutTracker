@@ -91,3 +91,8 @@ func (sq *SetQuantity) Create() (err error) {
 
 	return
 }
+
+func GetSetQuantity(id int) (sq SetQuantity, err error) {
+	err = db.QueryRowx("select * from setquantities where id = $1", id).StructScan(&sq)
+	return
+}
