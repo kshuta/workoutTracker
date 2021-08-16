@@ -192,6 +192,23 @@ func TestSetQuantityUpdate(t *testing.T) {
 	}
 }
 
+func TestSetQuantityDelete(t *testing.T) {
+	t.Parallel()
+	set, err := getTestSet()
+	assertNoError(t, err)
+	err = set.Create()
+	setIsCreated(t, *set, err)
+	sq := getTestSetQuantity(set)
+	err = sq.Create()
+	setQuantityIscreated(t, *sq, err)
+
+	sq.Delete()
+
+	_, err = GetSetQuantity(sq.Id)
+	assertError(t, err, err)
+
+}
+
 // returns set struct with populated fields
 // creates arbitrary lift for parent
 func getTestSet() (set *Set, err error) {

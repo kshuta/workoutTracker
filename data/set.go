@@ -101,3 +101,8 @@ func (sq *SetQuantity) Update() (err error) {
 	_, err = db.Exec("update setquantities set rep_type = $2, quantity = $3, weight = $4, planned_ratio = $5, ratio_type = $6 where id = $1", sq.Id, sq.Reptype, sq.Quantity, sq.Weight, sq.PlannedRatio, sq.Ratiotype)
 	return
 }
+
+func (sq *SetQuantity) Delete() (err error) {
+	_, err = db.Exec("delete from setquantities where id = $1", sq.Id)
+	return
+}
