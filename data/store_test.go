@@ -1,26 +1,15 @@
 package data
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
-
-func assertError(t testing.TB, got, want error) {
-	t.Helper()
-	if got != want {
-		t.Fatalf("got %q, want %q", got, want)
-	}
-}
-func assertNoError(t testing.TB, err error) {
-	if err != nil {
-		t.Fatal(err)
-	}
-}
 
 func TestMain(m *testing.M) {
 	setUp()
@@ -30,9 +19,17 @@ func TestMain(m *testing.M) {
 
 func setUp() {
 	var err error
-	db, err = sqlx.Connect("postgres", loaclDbDSN)
+	err = godotenv.Load(".env")
 	if err != nil {
-		log.Fatalln("couldn't connect to database: ", err)
+		log.Fatalln("Failed to load environment variables")
+	}
+	if local {
+		DSN := fmt.Sprintf(dsnUrlFormat, os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("DB_URL"), os.Getenv("DB_PORT"), os.Getenv("POSTGRES_DB"))
+		db, err = sqlx.Connect("postgres", DSN)
+		check(err)
+		if err != nil {
+			log.Fatalln("couldn't connect to database: ", err)
+		}
 	}
 
 	schema, err := getSQL(initSchemaFile)
@@ -47,67 +44,25 @@ func setUp() {
 	log.Println("Test set up complete")
 
 }
-func TestPlanCreate(t *testing.T) {
-	t.Run("creating plan", func(t *testing.T) {
-		plan := Plan{
-			Name:      "Test Plan Name",
-			Duration:  4,
-			Frequency: 3,
-			CreatedAt: time.Now(),
-		}
 
-		err := plan.Create()
-		assertNoError(t, err)
-		if plan.Id == 0 {
-			t.Errorf("insertion failed: plan id is still %d", plan.Id)
-		}
-	})
+// Tests if the given error matches the expected error.
+// if identical errors are passed in, the function can be used
+// to test if an error exists
+func assertError(t testing.TB, got, want error) {
+	t.Helper()
+	if got == nil {
+		t.Fatalf("error not envoked")
+	}
 
-	t.Run("creating plan with no name", func(t *testing.T) {
-		plan := Plan{
-			Duration:  4,
-			Frequency: 3,
-			CreatedAt: time.Now(),
-		}
-		err := plan.Create()
-		testEmptyField(t, plan, err)
-	})
-
-	t.Run("creating plan with no duration", func(t *testing.T) {
-		plan := Plan{
-			Name:      "Test Plan Name",
-			Frequency: 3,
-			CreatedAt: time.Now(),
-		}
-		err := plan.Create()
-		testEmptyField(t, plan, err)
-	})
-
-	t.Run("creating plan with no frequency", func(t *testing.T) {
-		plan := Plan{
-			Name:      "Test Plan Name",
-			Duration:  4,
-			CreatedAt: time.Now(),
-		}
-		err := plan.Create()
-		testEmptyField(t, plan, err)
-	})
-
-	t.Run("creating plan with no CreatedAt", func(t *testing.T) {
-		plan := Plan{
-			Name:      "Test Plan Name",
-			Duration:  4,
-			Frequency: 3,
-		}
-		err := plan.Create()
-		testEmptyField(t, plan, err)
-	})
+	if got != want {
+		t.Fatalf("expected error %q, got %q", want, got)
+	}
 }
 
-func testEmptyField(t *testing.T, plan Plan, err error) {
+// checks that the given error is nil
+func assertNoError(t testing.TB, err error) {
 	t.Helper()
-	assertError(t, err, ErrMissingField)
-	if plan.Id != 0 {
-		t.Errorf("error: insertion did not fail")
+	if err != nil {
+		t.Fatal("error found: ", err)
 	}
 }

@@ -2,15 +2,19 @@ package data
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
-var loaclDbDSN = "postgres://docker:docker@localhost:5432/docker?sslmode=disable"
+const dsnUrlFormat = "postgres://%s:%s@%s:%s/%s?sslmode=disable"
+const local = true
 
 // var remoteDbDSN =
 
@@ -24,8 +28,16 @@ func check(err error) {
 }
 
 func init() {
-	db, err := sqlx.Connect("postgres", loaclDbDSN)
-	check(err)
+	var err error
+	err = godotenv.Load(".env")
+	if err != nil {
+		log.Fatalln("Failed to load environment variables: ", err)
+	}
+	if local {
+		DSN := fmt.Sprintf(dsnUrlFormat, os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("DB_URL"), os.Getenv("DB_PORT"), os.Getenv("POSTGRES_DB"))
+		db, err = sqlx.Connect("postgres", DSN)
+		check(err)
+	}
 
 	// get sql statement with schema
 	// and execute it.
@@ -48,31 +60,5 @@ func getSQL(file string) (schema string, err error) {
 	}
 	schema = string(schemaStream)
 
-	return
-}
-
-const (
-	ErrMissingField = PlanErr("Plan struct missing field")
-)
-
-type PlanErr string
-
-func (e PlanErr) Error() string {
-	return string(e)
-}
-
-func (plan *Plan) Create() (err error) {
-	// check for empty fields
-	if plan.Name == "" || plan.Duration == 0 || plan.Frequency == 0 || plan.CreatedAt.IsZero() {
-		return ErrMissingField
-	}
-
-	statement := "insert into plans (name, duration, frequency, created_at) values ($1, $2, $3, $4) returning id"
-	stmt, err := db.Prepare(statement)
-	if err != nil {
-		return
-	}
-	defer stmt.Close()
-	err = stmt.QueryRow(plan.Name, plan.Duration, plan.Frequency, plan.CreatedAt).Scan(&plan.Id)
 	return
 }

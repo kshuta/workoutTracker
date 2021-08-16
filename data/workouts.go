@@ -2,45 +2,53 @@ package data
 
 import "time"
 
-type Plan struct {
+type Workout struct {
 	Id        int
 	Name      string
-	Duration  int
-	Frequency int
+	WeekNo    int `db:"week_no"`
+	Date      time.Time
 	CreatedAt time.Time `db:"created_at"`
 }
 
-type Workout struct {
-	Id        int
-	PlanId    int
-	Name      string
-	WeekNo    int
-	Date      time.Time
-	CreatedAt time.Time
+const (
+	ErrWorkoutMissingField = WorkoutErr("Workout struct is missing field")
+)
+
+type WorkoutErr string
+
+func (e WorkoutErr) Error() string {
+	return string(e)
 }
 
-type Lift struct {
-	Id        int
-	WorkoutId int
-	Name      string
-	Max       float64
-	CreatedAt time.Time
+func (workout *Workout) Create() (err error) {
+	if workout.Name == "" || workout.WeekNo == 0 || workout.Date.IsZero() || workout.CreatedAt.IsZero() {
+		err = ErrWorkoutMissingField
+		return
+	}
+
+	statement := "insert into workouts (name, week_no, date, created_at) values ($1, $2, $3, $4) returning id"
+	stmt, err := db.Prepare(statement)
+	if err != nil {
+		return
+	}
+
+	defer stmt.Close()
+	err = stmt.QueryRow(workout.Name, workout.WeekNo, workout.Date, workout.CreatedAt).Scan(&workout.Id)
+
+	return
 }
 
-type Set struct {
-	Id        int
-	LiftId    int
-	Done      bool
-	CreatedAt time.Time
+func GetWorkout(id int) (workout Workout, err error) {
+	err = db.QueryRowx("select * from workouts where id=$1", id).StructScan(&workout)
+	return
 }
 
-type SetQuantity struct {
-	Id           int
-	SetId        int
-	RepType      string
-	Quantity     int
-	Weight       float64
-	PlannedRatio int
-	Ratiotype    string
-	CreatedAt    time.Time
+func (workout *Workout) Update() (err error) {
+	_, err = db.Exec("update workouts set name = $2, week_no= $3, date = $4 where id = $1", workout.Id, workout.Name, workout.WeekNo, workout.Date)
+	return
+}
+
+func (workout *Workout) Delete() (err error) {
+	_, err = db.Exec("delete from workouts where id = $1", workout.Id)
+	return
 }
