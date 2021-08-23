@@ -8,7 +8,7 @@ drop table if exists workout_lifts;
 create table workouts (
     id serial primary key,
     name varchar(255) not null,
-    week_no integer,
+    week_no integer not null,
     date date,
     created_at timestamp not null
 );
