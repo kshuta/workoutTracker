@@ -7,7 +7,7 @@ drop table if exists workout_lifts;
 
 create table workouts (
     id serial primary key,
-    name varchar(255),
+    name varchar(255) not null,
     week_no integer,
     date date,
     created_at timestamp not null
@@ -15,14 +15,14 @@ create table workouts (
 
 create table lifts (
     id serial primary key,
-    name varchar(255),
-    max real,
+    name varchar(255) not null,
+    max real not null,
     created_at timestamp not null
 );
 
 create table sets (
     id serial primary key,
-    done boolean,
+    done boolean not null,
     created_at timestamp not null,
     lift_id integer references lifts(id)
 );
@@ -30,10 +30,10 @@ create table sets (
 create table setquantities (
     id serial primary key,
     rep_type varchar(255) not null,
-    quantity integer,
-    weight real, 
-    planned_ratio int,
-    ratio_type varchar(255),
+    quantity integer not null,
+    weight real not null, 
+    planned_ratio int not null,
+    ratio_type varchar(255) not null,
     set_id integer references sets(id),
     created_at timestamp not null 
 );

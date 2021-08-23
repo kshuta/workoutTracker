@@ -1,6 +1,7 @@
 package data
 
 import (
+	"database/sql"
 	"testing"
 	"time"
 )
@@ -165,7 +166,7 @@ func TestSetquantityRetrieve(t *testing.T) {
 	t.Run("retrieving SetQuantity that doesn't exist", func(t *testing.T) {
 		t.Parallel()
 		_, err := GetSetQuantity(-1)
-		assertError(t, err, err)
+		assertError(t, err, sql.ErrNoRows)
 	})
 
 }
@@ -205,7 +206,7 @@ func TestSetQuantityDelete(t *testing.T) {
 	sq.Delete()
 
 	_, err = GetSetQuantity(sq.Id)
-	assertError(t, err, err)
+	assertError(t, err, sql.ErrNoRows)
 
 }
 

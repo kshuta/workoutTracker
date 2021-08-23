@@ -1,6 +1,7 @@
 package data
 
 import (
+	"database/sql"
 	"testing"
 	"time"
 )
@@ -62,7 +63,7 @@ func TestLiftRetrieve(t *testing.T) {
 	t.Run("retrieve lift that doesn't exist", func(t *testing.T) {
 		t.Parallel()
 		_, err := GetLift(-1)
-		assertError(t, err, err)
+		assertError(t, err, sql.ErrNoRows)
 	})
 
 }
@@ -98,7 +99,7 @@ func TestLiftDelete(t *testing.T) {
 	assertNoError(t, err)
 
 	_, err = GetLift(delLift.Id)
-	assertError(t, err, err)
+	assertError(t, err, sql.ErrNoRows)
 }
 
 // returns lift struct with populated fields

@@ -1,6 +1,7 @@
 package data
 
 import (
+	"database/sql"
 	"testing"
 	"time"
 )
@@ -77,8 +78,8 @@ func TestWorkoutRetrieve(t *testing.T) {
 
 	t.Run("retrieving workout that doesn't exist", func(t *testing.T) {
 		t.Parallel()
-		_, err := GetWorkout(10000000)
-		assertError(t, err, err)
+		_, err := GetWorkout(-1)
+		assertError(t, err, sql.ErrNoRows)
 	})
 }
 
@@ -112,7 +113,7 @@ func TestWorkoutDelete(t *testing.T) {
 		workout.Delete()
 
 		_, err = GetWorkout(workout.Id)
-		assertError(t, err, err)
+		assertError(t, err, sql.ErrNoRows)
 	})
 }
 
