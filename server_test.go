@@ -1,5 +1,7 @@
 package main
 
-func TestServer() {
+import "testing"
+
+func TestServer(t *testing.T) {
 
 }

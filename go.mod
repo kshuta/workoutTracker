@@ -1,4 +1,4 @@
-module github.com/kshuta/workout_tracker
+module github.com/kshuta/workoutTracker
 
 go 1.16
 
