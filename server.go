@@ -4,4 +4,5 @@ import "fmt"
 
 func main() {
 	fmt.Println("hello from server")
+	fmt.Println(workout)
 }
