@@ -5,6 +5,7 @@ import "time"
 type Set struct {
 	Id        int
 	LiftId    int `db:"lift_id"`
+	WorkoutId int `db:"workout_id"`
 	Done      bool
 	CreatedAt time.Time `db:"created_at"`
 }
@@ -46,18 +47,18 @@ func (err SetErr) Error() string {
 }
 
 func (set *Set) Create() (err error) {
-	if set.LiftId == 0 || set.CreatedAt.IsZero() {
+	if set.LiftId == 0 || set.WorkoutId == 0 || set.CreatedAt.IsZero() {
 		return ErrSetMissingField
 	}
 
-	statement := "insert into sets (lift_id, done, created_at) values ($1, $2, $3) returning id"
+	statement := "insert into sets (lift_id, workout_id, done, created_at) values ($1, $2, $3, $4) returning id"
 
 	stmt, err := db.Prepare(statement)
 	if err != nil {
 		return
 	}
 
-	err = stmt.QueryRow(set.LiftId, set.Done, set.CreatedAt).Scan(&set.Id)
+	err = stmt.QueryRow(set.LiftId, set.WorkoutId, set.Done, set.CreatedAt).Scan(&set.Id)
 	return
 }
 
@@ -80,6 +81,7 @@ func (sq *SetQuantity) Create() (err error) {
 	if sq.SetId == 0 || sq.Reptype == 0 || sq.CreatedAt.IsZero() {
 		return ErrSetQuantityMissingField
 	}
+
 	statement := "insert into setquantities (set_id, rep_type, quantity, weight, planned_ratio, ratio_type, created_at) values ($1, $2, $3, $4, $5, $6, $7) returning id"
 
 	stmt, err := db.Prepare(statement)

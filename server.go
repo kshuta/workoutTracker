@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/julienschmidt/httprouter"
+
 	"github.com/kshuta/workoutTracker/data"
 )
 
@@ -31,7 +32,7 @@ func main() {
 // NewLift
 
 func Index(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	funcs := template.FuncMap{"fdate": fDate}
+	funcs := template.FuncMap{"fdate": fDate, "calcWeight": calcWeight}
 	t := template.New("layout").Funcs(funcs)
 
 	templ_files := []string{
@@ -50,9 +51,10 @@ func Index(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	sets := getTestSets()
 	sqs := getTestSetQuantity()
 
-	setinfos := combineInfo(sets, sqs)
+	liftinfos := combineInfo(lifts, sets, sqs)
+	setWeight(liftinfos)
 
-	t.ExecuteTemplate(w, "layout", lifts)
+	t.ExecuteTemplate(w, "layout", liftinfos)
 }
 
 func fDate(t time.Time) string {
@@ -60,33 +62,89 @@ func fDate(t time.Time) string {
 	return t.Format(layout)
 }
 
-type SetInfo struct {
-	Set       data.Set
-	Quantites []data.SetQuantity
+func setWeight(liftinfos []LiftInfo) {
+	for liftIdx, lift := range liftinfos {
+		for setIdx, setinfo := range lift.Setinfos {
+			weight := calcWeight(lift.Lift, setinfo.Quantity)
+			liftinfos[liftIdx].Setinfos[setIdx].Quantity.Weight = weight
+		}
+	}
 }
 
-func combineInfo(sets []data.Set, sqs []data.SetQuantity) []SetInfo {
-	sqIdx := 0
-	setinfos := make([]SetInfo, len(sets))
+func calcWeight(lift data.Lift, sq data.SetQuantity) float64 {
+	var finalWeight float64
+	var weight int
+	if sq.Ratiotype == data.Percentage {
+		weight = int(lift.Max * float64(sq.PlannedRatio) / 10)
+		det := weight % 100
+		if det < 13 {
+
+		} else if det < 38 {
+			weight = weight - det + 25
+		} else if det < 63 {
+			weight = weight - det + 50
+		} else if det < 88 {
+			weight = weight - det + 75
+		} else {
+			weight = weight - det + 100
+		}
+	} else {
+		// TODO: for when weight is rem
+	}
+
+	finalWeight = float64(weight) / 10.0
+	return finalWeight
+}
+
+type LiftInfo struct {
+	Lift     data.Lift
+	Setinfos []SetInfo
+}
+type SetInfo struct {
+	Set      data.Set
+	Quantity data.SetQuantity
+}
+
+// combines an array of Lift, Set and SetQuantity to create an array of LiftInfo
+// make sure Set is all from the same workout.
+// this is test code for displaying data on screen.
+// The variables are
+func combineInfo(lifts []data.Lift, sets []data.Set, sqs []data.SetQuantity) []LiftInfo {
+	setinfos := make([]SetInfo, 0)
 
 	for idx, val := range sets {
-		sqset := make([]data.SetQuantity, 0)
-		for {
 
-			sq := sqs[sqIdx]
-			if sq.SetId != val.Id {
+		sq := sqs[idx]
+
+		setinfo := SetInfo{
+			Set:      val,
+			Quantity: sq,
+		}
+
+		setinfos = append(setinfos, setinfo)
+	}
+
+	infoIdx := 0
+	liftInfos := make([]LiftInfo, 0)
+	for _, val := range lifts {
+		infos := make([]SetInfo, 0)
+
+		for infoIdx < len(setinfos) {
+			info := setinfos[infoIdx]
+			if info.Set.LiftId != val.Id {
 				break
 			}
 
-			sqset = append(sqset, sq)
+			infos = append(infos, info)
+			infoIdx++
 		}
 
-		setinfo := SetInfo{
-			Set:       val,
-			Quantites: sqset,
-		}
-		setinfos[idx] = setinfo
+		liftInfos = append(liftInfos, LiftInfo{
+			Lift:     val,
+			Setinfos: infos,
+		})
+
 	}
 
-	return setinfos
+	return liftInfos
 }

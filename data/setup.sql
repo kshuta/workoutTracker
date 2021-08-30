@@ -24,7 +24,8 @@ create table sets (
     id serial primary key,
     done boolean not null,
     created_at timestamp not null,
-    lift_id integer references lifts(id)
+    lift_id integer references lifts(id),
+    workout_id integer references workouts(id)
 );
 
 create table setquantities (

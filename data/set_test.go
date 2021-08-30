@@ -219,8 +219,15 @@ func getTestSet() (set *Set, err error) {
 		return nil, err
 	}
 
+	workout := getTestWorkout("workout for set test")
+	err = workout.Create()
+	if err != nil {
+		return nil, err
+	}
+
 	set = &Set{
 		LiftId:    lift.Id,
+		WorkoutId: workout.Id,
 		Done:      false,
 		CreatedAt: time.Now(),
 	}
@@ -243,6 +250,7 @@ func getTestSetQuantity(set *Set) (sq *SetQuantity) {
 }
 
 func setIsCreated(t *testing.T, set Set, err error) {
+	t.Helper()
 	assertNoError(t, err)
 	if set.Id == 0 {
 		t.Error("Insersion failed: set id is still 0")
@@ -250,6 +258,7 @@ func setIsCreated(t *testing.T, set Set, err error) {
 }
 
 func setQuantityIscreated(t *testing.T, sq SetQuantity, err error) {
+	t.Helper()
 	assertNoError(t, err)
 	if sq.Id == 0 {
 		t.Error("Insersion failed: SetQuantity id is still 0")
