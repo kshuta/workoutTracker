@@ -18,7 +18,7 @@ const local = true
 
 // var remoteDbDSN =
 
-var initSchemaFile = "setup.sql"
+var initSchemaFile = "data/setup.sql"
 var db *sqlx.DB
 
 func check(err error) {
@@ -29,7 +29,7 @@ func check(err error) {
 
 func init() {
 	var err error
-	err = godotenv.Load(".env")
+	err = godotenv.Load("data/.env")
 	if err != nil {
 		log.Fatalln("Failed to load environment variables: ", err)
 	}
