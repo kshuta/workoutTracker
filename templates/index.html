@@ -1,11 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta name="viewport" content="width=devise-width, initial-scale=1">
-    </head>
+{{ define "content" }}
     <body>
         <!-- Navbar -->
         <h1>Workout Tracker</h1>
+        <div class="row workout-container">
+            {{ range .}}
+            <div class="col-sm-6 workout-card">
+                <p>{{ .Name }}</p>
+                <p></p>
+            </div>
+            {{ end }}
+        </div>
         <!-- Footer -->
     </body>
-</html>
+{{ end }}

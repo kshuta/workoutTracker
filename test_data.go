@@ -3,7 +3,7 @@ package main
 import (
 	"time"
 
-	"github.com/kshuta/workout_tracker/data"
+	"github.com/kshuta/workoutTracker/data"
 )
 
 func getTestWorkouts() []data.Workout {
@@ -38,6 +38,18 @@ func getTestLifts() []data.Lift {
 			Id:        3,
 			Name:      "Deadlifts",
 			Max:       200,
+			CreatedAt: time.Now(),
+		},
+		{
+			Id:        4,
+			Name:      "Overhead Press",
+			Max:       70,
+			CreatedAt: time.Now(),
+		},
+		{
+			Id:        5,
+			Name:      "Hang Clean",
+			Max:       80,
 			CreatedAt: time.Now(),
 		},
 	}
@@ -92,7 +104,7 @@ func getTestSets() []data.Set {
 	return sets
 }
 
-func getSetQuantity() []data.SetQuantity {
+func getTestSetQuantity() []data.SetQuantity {
 	sqs := []data.SetQuantity{
 		{
 			Id:           1,

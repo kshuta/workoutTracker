@@ -1,0 +1,23 @@
+* {
+    margin: 0;
+    padding: 0;
+    clear: none;
+}
+body {
+    width: 100%;
+}
+.workout-container {
+    margin: 0 auto;
+    width: 90%;
+}
+.workout-card {
+    width: 300px;
+    box-shadow: 2px 2px 5px 0px;
+    margin: 30px;
+}
+
+@media only screen and (max-width: 767px){
+    .workout-card {
+        margin: 30px auto;
+    } 
+}
