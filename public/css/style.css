@@ -6,14 +6,31 @@
 body {
     width: 100%;
 }
+.main-heading {
+    padding: 5px
+}
+
+.workout-info-heading {
+    padding: 15px
+}
+
+.workout-info {
+    padding: 0px 15px 15px 15px;
+}
+
+.workout-heading {
+    margin-left: 50px;
+}
 .workout-container {
     margin: 0 auto;
     width: 90%;
+    /* display: flex; */
+    /* flex-flow: column wrap; */
 }
 .workout-card {
-    width: 300px;
+    /* width: 300px; */
     box-shadow: 2px 2px 5px 0px;
-    margin: 30px;
+    margin: 15px;
 }
 
 @media only screen and (max-width: 767px){

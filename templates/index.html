@@ -1,20 +1,36 @@
 {{ define "content" }}
     <body>
         <!-- Navbar -->
-        <h1>Workout Tracker</h1>
-        <div class="row workout-container">
-            <div class="col-sm-6 workout-card">
-            {{ range .}}
-                <p>{{ .Lift.Name }}</p>
-                {{ range .Setinfos }}
-                    <div>
-                        <p>
-                            <label for="{{ .Quantity.CreatedAt }}">{{ .Quantity.Weight }}</label> 
-                            <input type="checkbox" value="{{ .Set.Done }}" id="{{.Quantity.CreatedAt }}"/>
-                        </p>
+        <h1 class="main-heading">Workout Tracker</h1>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <a class="btn btn-primary btn-lg">Create new workout</a>
+                </div>
+                <div class="col-md-9 col-sm">
+                    <h3 class="workout-heading">This week's workouts {{ .startDay | fdate}} - {{ .endDay | fdate }}</h3>
+                    <div class="workout-container">
+                        {{ range .workouts}}
+                            <div class="workout-card">
+                                <div class="workout-info-heading">
+                                    <h3>Day {{ .Workout.WeekNo }} </h3>
+                                    <p>{{ .Workout.Date | fdate}}</p>
+                                </div>
+                                <div class="workout-info row">
+                                {{ range .Liftinfos }}
+                                    <div class="col col-md-12">
+                                        <strong>{{ .Lift.Name }}</strong>
+                                                {{ range .Setinfos }}
+                                                {{ .Quantity.Weight }} x {{ .Quantity.Quantity }}                                                    
+                                                {{ end }}
+                                    </div>
+                                {{ end }}
+                                </div>
+                            </div>
+                        {{ end }}
                     </div>
-                {{ end }}
-            {{ end }}
+                </div>
+
             </div>
         </div>
         <!-- Footer -->
