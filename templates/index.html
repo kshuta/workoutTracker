@@ -3,19 +3,21 @@
         <!-- Navbar -->
         <h1>Workout Tracker</h1>
         <div class="row workout-container">
-            <div class="col-sm-6 workout-card">
             {{ range .}}
-                <p>{{ .Lift.Name }}</p>
-                {{ range .Setinfos }}
-                    <div>
-                        <p>
-                            <label for="{{ .Quantity.CreatedAt }}">{{ .Quantity.Weight }}</label> 
-                            <input type="checkbox" value="{{ .Set.Done }}" id="{{.Quantity.CreatedAt }}"/>
-                        </p>
-                    </div>
+                <div class="col-sm-6 workout-card">
+                {{ range .Liftinfos }}
+                    <p>{{ .Lift.Name }}</p>
+                    {{ range .Setinfos }}
+                        <div>
+                            <p>
+                                <label for="{{ .Quantity.CreatedAt }}">{{ .Quantity.Weight }} x {{ .Quantity.Quantity }}</label> 
+                                <input type="checkbox" value="{{ .Set.Done }}" id="{{.Quantity.CreatedAt }}"/>
+                            </p>
+                        </div>
+                    {{ end }}
                 {{ end }}
+                </div>
             {{ end }}
-            </div>
         </div>
         <!-- Footer -->
     </body>

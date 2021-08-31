@@ -54,7 +54,14 @@ func Index(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	liftinfos := combineInfo(lifts, sets, sqs)
 	setWeight(liftinfos)
 
-	t.ExecuteTemplate(w, "layout", liftinfos)
+	workoutinfo, err := createTestData()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Print(workoutinfo)
+
+	t.ExecuteTemplate(w, "layout", workoutinfo)
 }
 
 func fDate(t time.Time) string {
@@ -94,15 +101,6 @@ func calcWeight(lift data.Lift, sq data.SetQuantity) float64 {
 
 	finalWeight = float64(weight) / 10.0
 	return finalWeight
-}
-
-type LiftInfo struct {
-	Lift     data.Lift
-	Setinfos []SetInfo
-}
-type SetInfo struct {
-	Set      data.Set
-	Quantity data.SetQuantity
 }
 
 // combines an array of Lift, Set and SetQuantity to create an array of LiftInfo

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/kshuta/workoutTracker/data"
@@ -12,6 +13,55 @@ func getTestWorkouts() []data.Workout {
 			Id:        1,
 			Name:      "test-workout",
 			WeekNo:    1,
+			Date:      time.Now(),
+			CreatedAt: time.Now(),
+		},
+		{
+			Id:        2,
+			Name:      "test-workout-2",
+			WeekNo:    2,
+			Date:      time.Now(),
+			CreatedAt: time.Now(),
+		},
+		{
+			Id:        3,
+			Name:      "test-workout-3",
+			WeekNo:    2,
+			Date:      time.Now(),
+			CreatedAt: time.Now(),
+		},
+		{
+			Id:        4,
+			Name:      "test-workout-4",
+			WeekNo:    2,
+			Date:      time.Now(),
+			CreatedAt: time.Now(),
+		},
+		{
+			Id:        5,
+			Name:      "test-workout-5",
+			WeekNo:    2,
+			Date:      time.Now(),
+			CreatedAt: time.Now(),
+		},
+		{
+			Id:        6,
+			Name:      "test-workout-6",
+			WeekNo:    2,
+			Date:      time.Now(),
+			CreatedAt: time.Now(),
+		},
+		{
+			Id:        7,
+			Name:      "test-workout-7",
+			WeekNo:    2,
+			Date:      time.Now(),
+			CreatedAt: time.Now(),
+		},
+		{
+			Id:        8,
+			Name:      "test-workout-8",
+			WeekNo:    2,
 			Date:      time.Now(),
 			CreatedAt: time.Now(),
 		},
@@ -172,4 +222,94 @@ func getTestSetQuantity() []data.SetQuantity {
 	}
 
 	return sqs
+}
+
+type LiftInfo struct {
+	Lift     data.Lift
+	Setinfos []SetInfo
+}
+type SetInfo struct {
+	Set      data.Set
+	Quantity data.SetQuantity
+}
+
+type WorkoutInfo struct {
+	Liftinfos []LiftInfo
+}
+
+func createTestData() (workoutinfos []WorkoutInfo, err error) {
+
+	for i := 0; i < 8; i++ {
+		name := fmt.Sprintf("workout%d", i)
+		weekno := i%4 + 1
+		workout := data.Workout{
+			Name:      name,
+			WeekNo:    weekno,
+			Date:      time.Now(),
+			CreatedAt: time.Now(),
+		}
+		err = workout.Create()
+		if err != nil {
+			return
+		}
+
+		liftinfos := make([]LiftInfo, 0)
+		for li := 0; li < 2; li++ {
+			name := fmt.Sprintf("lift%d", (li+i)%4+1)
+			max := float64(50 * ((li+i)%4 + 1))
+			lift := data.Lift{
+				Name:      name,
+				Max:       max,
+				CreatedAt: time.Now(),
+			}
+
+			err = lift.Create()
+
+			if err != nil {
+				return
+			}
+
+			setinfos := make([]SetInfo, 0)
+			for si := 0; si < 4; si++ {
+				set := data.Set{
+					LiftId:    lift.Id,
+					WorkoutId: workout.Id,
+					Done:      false,
+					CreatedAt: time.Now(),
+				}
+				err = set.Create()
+				if err != nil {
+					return
+				}
+
+				sq := data.SetQuantity{
+					SetId:        set.Id,
+					Reptype:      data.Count,
+					Quantity:     i + 1,
+					PlannedRatio: int(70 + (si * 3)),
+					Ratiotype:    data.Percentage,
+					CreatedAt:    time.Now(),
+				}
+
+				sq.Weight = calcWeight(lift, sq)
+
+				setinfo := SetInfo{
+					Set:      set,
+					Quantity: sq,
+				}
+				setinfos = append(setinfos, setinfo)
+			}
+			liftinfos = append(liftinfos, LiftInfo{
+				Lift:     lift,
+				Setinfos: setinfos,
+			})
+		}
+
+		workoutinfos = append(workoutinfos, WorkoutInfo{
+			Liftinfos: liftinfos,
+		})
+	}
+
+	return
+
 }
