@@ -59,6 +59,7 @@ func Index(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		log.Fatal(err)
 	}
 
+<<<<<<< HEAD
 	context := map[string]interface{}{
 		"workouts": workoutinfo[:4],
 		"startDay": workoutinfo[0].Workout.Date,
@@ -66,6 +67,11 @@ func Index(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	}
 
 	t.ExecuteTemplate(w, "layout", context)
+=======
+	log.Print(workoutinfo)
+
+	t.ExecuteTemplate(w, "layout", workoutinfo)
+>>>>>>> 3d051aee417671a0bf270ef44da8d762808d8d83
 }
 
 func fDate(t time.Time) string {

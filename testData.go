@@ -234,7 +234,10 @@ type SetInfo struct {
 }
 
 type WorkoutInfo struct {
+<<<<<<< HEAD
 	Workout   data.Workout
+=======
+>>>>>>> 3d051aee417671a0bf270ef44da8d762808d8d83
 	Liftinfos []LiftInfo
 }
 
@@ -246,7 +249,11 @@ func createTestData() (workoutinfos []WorkoutInfo, err error) {
 		workout := data.Workout{
 			Name:      name,
 			WeekNo:    weekno,
+<<<<<<< HEAD
 			Date:      time.Date(2021, time.August, 30+i, 0, 0, 0, 0, time.Local),
+=======
+			Date:      time.Now(),
+>>>>>>> 3d051aee417671a0bf270ef44da8d762808d8d83
 			CreatedAt: time.Now(),
 		}
 		err = workout.Create()
@@ -307,7 +314,10 @@ func createTestData() (workoutinfos []WorkoutInfo, err error) {
 		}
 
 		workoutinfos = append(workoutinfos, WorkoutInfo{
+<<<<<<< HEAD
 			Workout:   workout,
+=======
+>>>>>>> 3d051aee417671a0bf270ef44da8d762808d8d83
 			Liftinfos: liftinfos,
 		})
 	}
