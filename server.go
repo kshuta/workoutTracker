@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
@@ -14,6 +15,7 @@ import (
 func main() {
 	mux := httprouter.New()
 	mux.GET("/", Index)
+	mux.GET("/workouts/:workoutId", Detail)
 
 	mux.ServeFiles("/static/*filepath", http.Dir("public"))
 
@@ -26,13 +28,16 @@ func main() {
 
 }
 
+var funcs = template.FuncMap{
+	"fdate": fDate,
+}
+
 // Index
 // Detail
 // NewWorkout
 // NewLift
 
 func Index(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	funcs := template.FuncMap{"fdate": fDate, "calcWeight": calcWeight}
 	t := template.New("layout").Funcs(funcs)
 
 	templ_files := []string{
@@ -41,18 +46,12 @@ func Index(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	}
 
 	t, err := t.ParseFiles(templ_files...)
+
 	if err != nil {
 		// change to redirect to error page
 		w.WriteHeader(400)
 		log.Fatal(err)
 	}
-
-	lifts := getTestLifts()
-	sets := getTestSets()
-	sqs := getTestSetQuantity()
-
-	liftinfos := combineInfo(lifts, sets, sqs)
-	setWeight(liftinfos)
 
 	workoutinfo, err := createTestData()
 	if err != nil {
@@ -67,18 +66,46 @@ func Index(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	t.ExecuteTemplate(w, "layout", context)
 }
 
+func Detail(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	id, err := strconv.Atoi(p.ByName("workoutId"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// load data
+	workout, err := data.GetWorkout(id)
+	if err != nil {
+		w.WriteHeader(400)
+		log.Fatal(err)
+	}
+
+	// sets := data.GetSets(workout.id)
+
+	templ_files := []string{
+		"templates/layout.html",
+		"templates/detail.html",
+	}
+
+	t := template.New("layout").Funcs(funcs)
+
+	t, err = t.ParseFiles(templ_files...)
+
+	if err != nil {
+		w.WriteHeader(400)
+		log.Fatal(err)
+	}
+
+	t.ExecuteTemplate(w, "layout", workout)
+
+}
+
+func New(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+
+}
+
 func fDate(t time.Time) string {
 	layout := "2006/01/02"
 	return t.Format(layout)
-}
-
-func setWeight(liftinfos []LiftInfo) {
-	for liftIdx, lift := range liftinfos {
-		for setIdx, setinfo := range lift.Setinfos {
-			weight := calcWeight(lift.Lift, setinfo.Quantity)
-			liftinfos[liftIdx].Setinfos[setIdx].Quantity.Weight = weight
-		}
-	}
 }
 
 func calcWeight(lift data.Lift, sq data.SetQuantity) float64 {

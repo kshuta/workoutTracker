@@ -11,6 +11,7 @@
                     <h3 class="workout-heading">This week's workouts {{ .startDay | fdate}} - {{ .endDay | fdate }}</h3>
                     <div class="workout-container">
                         {{ range .workouts}}
+                        <a href="/workouts/{{ .Workout.Id }}">
                             <div class="workout-card">
                                 <div class="workout-info-heading">
                                     <h3>Day {{ .Workout.WeekNo }} </h3>
@@ -27,6 +28,7 @@
                                 {{ end }}
                                 </div>
                             </div>
+                        </a>
                         {{ end }}
                     </div>
                 </div>
