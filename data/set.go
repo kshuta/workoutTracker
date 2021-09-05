@@ -108,3 +108,35 @@ func (sq *SetQuantity) Delete() (err error) {
 	_, err = db.Exec("delete from setquantities where id = $1", sq.Id)
 	return
 }
+
+func GetSetInfos(workoutId, liftId int) (setinfos []SetInfo, err error) {
+
+	rows, err := db.Queryx("select * from sets where workout_id=$1 and lift_id=$2", workoutId, liftId)
+
+	defer func() {
+		if rows.Err() != nil {
+			err = rows.Err()
+		}
+		rows.Close()
+	}()
+
+	for rows.Next() {
+		var set Set
+		err = rows.StructScan(&set)
+		if err != nil {
+			rows.Close()
+			return
+		}
+
+		var sq SetQuantity
+		err = db.QueryRowx("select * from setquantities where set_id=$1", set.Id).StructScan(&sq)
+		if err != nil {
+			rows.Close()
+			return
+		}
+
+		setinfos = append(setinfos, SetInfo{Set: set, Quantity: sq})
+	}
+
+	return
+}

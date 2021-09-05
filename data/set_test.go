@@ -210,19 +210,78 @@ func TestSetQuantityDelete(t *testing.T) {
 
 }
 
-// returns set struct with populated fields
-// creates arbitrary lift for parent
-func getTestSet() (set *Set, err error) {
-	lift := getTestLift("lift for set test")
-	err = lift.Create()
-	if err != nil {
-		return nil, err
+func TestGetSetInfos(t *testing.T) {
+	t.Parallel()
+	workout, lift, err := getSetParents()
+	assertNoError(t, err)
+
+	setinfos, err := creatTestSetInfos(workout, lift)
+	assertNoError(t, err)
+
+	retrievedSetInfos, err := GetSetInfos(workout.Id, lift.Id)
+	assertNoError(t, err)
+
+	if len(retrievedSetInfos) != len(setinfos) {
+		t.Fatalf("length of SetInfo is not the same. Expected %d setinfos, got %d setinfos", len(setinfos), len(retrievedSetInfos))
 	}
 
-	workout := getTestWorkout("workout for set test")
-	err = workout.Create()
+	for idx, setinfo := range setinfos {
+		if setinfo.Set.Id != retrievedSetInfos[idx].Set.Id {
+			t.Fatalf("Retrieved setinfo differs. Expected setinfo with set id %d, got set id %d", setinfo.Set.Id, retrievedSetInfos[idx].Set.Id)
+		}
+		if setinfo.Quantity.Id != retrievedSetInfos[idx].Quantity.Id {
+			t.Fatalf("Retrieved setinfo differs. Expected setinfo with SetQuantity id %d, got SetQuantity id %d", setinfo.Quantity.Id, retrievedSetInfos[idx].Quantity.Id)
+		}
+	}
+}
+
+// returns multiple set struct with same workout id
+// creates arbitrary lift and workout for parent
+func creatTestSetInfos(workout *Workout, lift *Lift) (setinfos []SetInfo, err error) {
+	setinfos = make([]SetInfo, 0)
+	for i := 0; i < 4; i++ {
+		set := Set{
+			LiftId:    lift.Id,
+			WorkoutId: workout.Id,
+			Done:      false,
+			CreatedAt: time.Now(),
+		}
+		err = set.Create()
+		if err != nil {
+			return
+		}
+
+		sq := SetQuantity{
+			SetId:        set.Id,
+			Reptype:      Count,
+			Quantity:     i + 4,
+			PlannedRatio: int(70 + (i+1)*4),
+			Ratiotype:    Percentage,
+			CreatedAt:    time.Now(),
+		}
+		err = sq.Create()
+		if err != nil {
+			return
+		}
+
+		setinfo := SetInfo{
+			Set:      set,
+			Quantity: sq,
+		}
+
+		setinfos = append(setinfos, setinfo)
+	}
+
+	return
+
+}
+
+// returns set struct with populated fields
+// creates arbitrary lift and workout for parent
+func getTestSet() (set *Set, err error) {
+	workout, lift, err := getSetParents()
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	set = &Set{
@@ -231,6 +290,24 @@ func getTestSet() (set *Set, err error) {
 		Done:      false,
 		CreatedAt: time.Now(),
 	}
+
+	return
+}
+
+// gets created lift and workout to create sets
+func getSetParents() (workout *Workout, lift *Lift, err error) {
+	lift = getTestLift("lift for set test")
+	err = lift.Create()
+	if err != nil {
+		return
+	}
+
+	workout = getTestWorkout("workout for set test")
+	err = workout.Create()
+	if err != nil {
+		return
+	}
+
 	return
 }
 

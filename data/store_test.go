@@ -19,7 +19,7 @@ func TestMain(m *testing.M) {
 
 func setUp() {
 	var err error
-	err = godotenv.Load(".env")
+	err = godotenv.Load()
 	if err != nil {
 		log.Fatalln("Failed to load environment variables")
 	}
