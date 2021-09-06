@@ -117,6 +117,18 @@ func TestWorkoutDelete(t *testing.T) {
 	})
 }
 
+// func TestWorkoutLift(t *testing.T) {
+// 	workouts := make([]Workout, 2)
+// 	for i := 0; i < 2; i++ {
+// 		workout := getTestWorkout("test workout")
+// 		err := workout.Create()
+// 		assertNoError(t, err)
+
+// 		// workouts[i] = workout
+// 	}
+
+// }
+
 // returns workout struct with populated fields
 func getTestWorkout(workoutName string) (workout *Workout) {
 	workout = &Workout{

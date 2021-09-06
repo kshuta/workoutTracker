@@ -76,7 +76,7 @@ func Detail(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	workout, err := data.GetWorkout(id)
 	if err != nil {
 		w.WriteHeader(400)
-		log.Fatal(err)
+		log.Fatalf("error in Detail Handler: %s", err)
 	}
 
 	// sets := data.GetSets(workout.id)
@@ -131,48 +131,4 @@ func calcWeight(lift data.Lift, sq data.SetQuantity) float64 {
 
 	finalWeight = float64(weight) / 10.0
 	return finalWeight
-}
-
-// combines an array of Lift, Set and SetQuantity to create an array of LiftInfo
-// make sure Set is all from the same workout.
-// this is test code for displaying data on screen.
-// The variables are
-func combineInfo(lifts []data.Lift, sets []data.Set, sqs []data.SetQuantity) []LiftInfo {
-	setinfos := make([]SetInfo, 0)
-
-	for idx, val := range sets {
-
-		sq := sqs[idx]
-
-		setinfo := SetInfo{
-			Set:      val,
-			Quantity: sq,
-		}
-
-		setinfos = append(setinfos, setinfo)
-	}
-
-	infoIdx := 0
-	liftInfos := make([]LiftInfo, 0)
-	for _, val := range lifts {
-		infos := make([]SetInfo, 0)
-
-		for infoIdx < len(setinfos) {
-			info := setinfos[infoIdx]
-			if info.Set.LiftId != val.Id {
-				break
-			}
-
-			infos = append(infos, info)
-			infoIdx++
-		}
-
-		liftInfos = append(liftInfos, LiftInfo{
-			Lift:     val,
-			Setinfos: infos,
-		})
-
-	}
-
-	return liftInfos
 }

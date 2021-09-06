@@ -7,21 +7,7 @@ import (
 	"github.com/kshuta/workoutTracker/data"
 )
 
-type LiftInfo struct {
-	Lift     data.Lift
-	Setinfos []SetInfo
-}
-type SetInfo struct {
-	Set      data.Set
-	Quantity data.SetQuantity
-}
-
-type WorkoutInfo struct {
-	Workout   data.Workout
-	Liftinfos []LiftInfo
-}
-
-func createTestData() (workoutinfos []WorkoutInfo, err error) {
+func createTestData() (workoutinfos []data.WorkoutInfo, err error) {
 
 	for i := 0; i < 8; i++ {
 		name := fmt.Sprintf("workout%d", i)
@@ -37,7 +23,7 @@ func createTestData() (workoutinfos []WorkoutInfo, err error) {
 			return
 		}
 
-		liftinfos := make([]LiftInfo, 0)
+		liftinfos := make([]data.LiftInfo, 0)
 		for li := 0; li < 2; li++ {
 			name := fmt.Sprintf("lift%d", (li+i)%4+1)
 			max := float64(50 * ((li+i)%4 + 1))
@@ -53,7 +39,7 @@ func createTestData() (workoutinfos []WorkoutInfo, err error) {
 				return
 			}
 
-			setinfos := make([]SetInfo, 0)
+			setinfos := make([]data.SetInfo, 0)
 			for si := 0; si < 4; si++ {
 				set := data.Set{
 					LiftId:    lift.Id,
@@ -77,19 +63,19 @@ func createTestData() (workoutinfos []WorkoutInfo, err error) {
 
 				sq.Weight = calcWeight(lift, sq)
 
-				setinfo := SetInfo{
+				setinfo := data.SetInfo{
 					Set:      set,
 					Quantity: sq,
 				}
 				setinfos = append(setinfos, setinfo)
 			}
-			liftinfos = append(liftinfos, LiftInfo{
+			liftinfos = append(liftinfos, data.LiftInfo{
 				Lift:     lift,
 				Setinfos: setinfos,
 			})
 		}
 
-		workoutinfos = append(workoutinfos, WorkoutInfo{
+		workoutinfos = append(workoutinfos, data.WorkoutInfo{
 			Workout:   workout,
 			Liftinfos: liftinfos,
 		})
