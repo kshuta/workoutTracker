@@ -41,6 +41,11 @@ func GetLift(id int) (lift Lift, err error) {
 	return
 }
 
+func GetLifts() (lifts []Lift, err error) {
+	lifts, err = GetWorkoutLifts(Workout{})
+	return
+}
+
 func (lift *Lift) Update() (err error) {
 	_, err = db.Exec("update lifts set name = $2, max = $3 where id = $1", lift.Id, lift.Name, lift.Max)
 	return

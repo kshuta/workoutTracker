@@ -19,11 +19,11 @@ func TestMain(m *testing.M) {
 
 func setUp() {
 	var err error
-	err = godotenv.Load()
-	if err != nil {
-		log.Fatalln("Failed to load environment variables")
-	}
 	if local {
+		err = godotenv.Load(".env.local")
+		if err != nil {
+			log.Fatalln("Failed to load environment variables")
+		}
 		DSN := fmt.Sprintf(dsnUrlFormat, os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("DB_URL"), os.Getenv("DB_PORT"), os.Getenv("POSTGRES_DB"))
 		db, err = sqlx.Connect("postgres", DSN)
 		check(err)

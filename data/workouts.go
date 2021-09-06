@@ -1,7 +1,6 @@
 package data
 
 import (
-	"log"
 	"time"
 )
 
@@ -37,7 +36,6 @@ func (workout *Workout) Create() (err error) {
 
 	defer stmt.Close()
 	err = stmt.QueryRow(workout.Name, workout.WeekNo, workout.Date, workout.CreatedAt).Scan(&workout.Id)
-	log.Printf("workout id=%d created", workout.Id)
 
 	return
 }

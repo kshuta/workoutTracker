@@ -18,7 +18,7 @@ const local = true
 
 // var remoteDbDSN =
 
-var initSchemaFile = "data/setup.sql"
+var initSchemaFile = "setup.sql"
 var db *sqlx.DB
 
 func check(err error) {

@@ -13,10 +13,7 @@ func TestWorkoutCreate(t *testing.T) {
 		workout := getTestWorkout("Test workout")
 
 		err := workout.Create()
-		assertNoError(t, err)
-		if workout.Id == 0 {
-			t.Error("insertion failed: workout id is still 0")
-		}
+		workoutIsCreated(t, *workout, err)
 
 	})
 
@@ -47,6 +44,13 @@ func TestWorkoutCreate(t *testing.T) {
 		err := workout.Create()
 		testWorkoutEmptyField(t, *workout, err)
 	})
+}
+
+func workoutIsCreated(t *testing.T, workout Workout, err error) {
+	assertNoError(t, err)
+	if workout.Id == 0 {
+		t.Error("insertion failed: workout id is still 0")
+	}
 }
 
 // checks for correct error const
@@ -116,18 +120,6 @@ func TestWorkoutDelete(t *testing.T) {
 		assertError(t, err, sql.ErrNoRows)
 	})
 }
-
-// func TestWorkoutLift(t *testing.T) {
-// 	workouts := make([]Workout, 2)
-// 	for i := 0; i < 2; i++ {
-// 		workout := getTestWorkout("test workout")
-// 		err := workout.Create()
-// 		assertNoError(t, err)
-
-// 		// workouts[i] = workout
-// 	}
-
-// }
 
 // returns workout struct with populated fields
 func getTestWorkout(workoutName string) (workout *Workout) {

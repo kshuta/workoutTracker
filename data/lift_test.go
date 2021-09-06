@@ -2,6 +2,7 @@ package data
 
 import (
 	"database/sql"
+	"fmt"
 	"testing"
 	"time"
 )
@@ -100,6 +101,83 @@ func TestLiftDelete(t *testing.T) {
 
 	_, err = GetLift(delLift.Id)
 	assertError(t, err, sql.ErrNoRows)
+}
+
+func TestLiftWorkout(t *testing.T) {
+	t.Parallel()
+	// workout 1
+	// bench, dead, squat
+	// workout 2
+	// bench squat overhead
+	// workout 3
+	// dead overhead
+	liftNames := []string{
+		"Benchpress",
+		"Squat",
+		"Deadlift",
+		"OverHead press",
+	}
+
+	lifts := make([]Lift, len(liftNames))
+	workouts := make([]Workout, 3)
+
+	for idx, val := range liftNames {
+		lift := getTestLift(val)
+		err := lift.Create()
+		liftIsCreated(t, *lift, err)
+		lifts[idx] = *lift
+	}
+
+	for i := 0; i < 3; i++ {
+		name := fmt.Sprintf("Workout:%d", i+1)
+		workout := getTestWorkout(name)
+		workout.WeekNo = i + 1
+		err := workout.Create()
+		workoutIsCreated(t, *workout, err)
+		workouts[i] = *workout
+	}
+
+	for idx, workout := range workouts {
+		for _, lift := range lifts[idx : idx+2] {
+			err := CreateLiftWorkout(&workout, &lift)
+			assertNoError(t, err)
+		}
+	}
+
+	expectedNames := [][]string{
+		{
+			"Benchpress",
+			"Squat",
+		},
+		{
+			"Squat",
+			"Deadlift",
+		},
+		{
+			"Deadlift",
+			"OverHead press",
+		},
+	}
+
+	for widx, names := range expectedNames {
+		lifts, err := GetWorkoutLifts(workouts[widx])
+		assertNoError(t, err)
+
+		found := false
+		for _, name := range names {
+			for _, lift := range lifts {
+				if lift.Name == name {
+					found = true
+					break
+				}
+			}
+
+			if !found {
+				t.Fatalf("could not find expected lift: %s", name)
+			}
+		}
+	}
+
 }
 
 // returns lift struct with populated fields
