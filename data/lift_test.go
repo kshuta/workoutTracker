@@ -39,6 +39,7 @@ func TestLiftCreate(t *testing.T) {
 }
 
 func liftIsCreated(t *testing.T, lift Lift, err error) {
+	t.Helper()
 	assertNoError(t, err)
 
 	if lift.Id == 0 {
@@ -104,13 +105,6 @@ func TestLiftDelete(t *testing.T) {
 }
 
 func TestLiftWorkout(t *testing.T) {
-	t.Parallel()
-	// workout 1
-	// bench, dead, squat
-	// workout 2
-	// bench squat overhead
-	// workout 3
-	// dead overhead
 	liftNames := []string{
 		"Benchpress",
 		"Squat",
@@ -136,48 +130,71 @@ func TestLiftWorkout(t *testing.T) {
 		workoutIsCreated(t, *workout, err)
 		workouts[i] = *workout
 	}
-
-	for idx, workout := range workouts {
-		for _, lift := range lifts[idx : idx+2] {
-			err := CreateLiftWorkout(&workout, &lift)
-			assertNoError(t, err)
+	t.Run("create TestLiftWorkout", func(t *testing.T) {
+		for idx, workout := range workouts {
+			for _, lift := range lifts[idx : idx+2] {
+				err := CreateLiftWorkout(&workout, &lift)
+				assertNoError(t, err)
+			}
 		}
-	}
+	})
 
-	expectedNames := [][]string{
-		{
-			"Benchpress",
-			"Squat",
-		},
-		{
-			"Squat",
-			"Deadlift",
-		},
-		{
-			"Deadlift",
-			"OverHead press",
-		},
-	}
+	t.Run("retrieve lifts associated with workout", func(t *testing.T) {
+		expectedNames := [][]string{
+			{
+				"Benchpress",
+				"Squat",
+			},
+			{
+				"Squat",
+				"Deadlift",
+			},
+			{
+				"Deadlift",
+				"OverHead press",
+			},
+		}
 
-	for widx, names := range expectedNames {
-		lifts, err := GetWorkoutLifts(workouts[widx])
-		assertNoError(t, err)
+		for widx, names := range expectedNames {
+			lifts, err := GetWorkoutLifts(workouts[widx])
+			assertNoError(t, err)
 
-		found := false
-		for _, name := range names {
-			for _, lift := range lifts {
-				if lift.Name == name {
-					found = true
-					break
+			found := false
+			for _, name := range names {
+				for _, lift := range lifts {
+					if lift.Name == name {
+						found = true
+						break
+					}
+				}
+
+				if !found {
+					t.Fatalf("could not find expected lift: %s", name)
 				}
 			}
-
-			if !found {
-				t.Fatalf("could not find expected lift: %s", name)
-			}
 		}
-	}
+	})
 
+	t.Run("get all lifts", func(t *testing.T) {
+		_, err := db.Exec("update lifts set is_deleted = true") // reset lift table
+		if err != nil {
+			t.Error(err)
+		}
+
+		for i := 0; i < 4; i++ {
+			lift := getTestLift("get all lift test")
+			err := lift.Create()
+			assertNoError(t, err)
+		}
+
+		lifts, err := GetLifts()
+		assertNoError(t, err)
+
+		if len(lifts) != 4 {
+			t.Fatalf("could not retrieve all lifts")
+		}
+
+	})
 }
 
 // returns lift struct with populated fields
@@ -186,6 +203,7 @@ func getTestLift(liftName string) (lift *Lift) {
 		Name:      liftName,
 		Max:       60,
 		CreatedAt: time.Now(),
+		IsDeleted: false,
 	}
 	return
 }

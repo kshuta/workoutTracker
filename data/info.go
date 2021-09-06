@@ -30,6 +30,11 @@ func CreateLiftWorkout(workout *Workout, lift *Lift) (err error) {
 }
 
 func GetWorkoutLifts(workout Workout) (lifts []Lift, err error) {
+
+	if workout.Id == 0 {
+		err = errors.New("workout does not exist in database")
+		return
+	}
 	rows, err := db.Queryx("select lift_id from workout_lifts where workout_id=$1", workout.Id)
 	if err != nil {
 		rows.Close()

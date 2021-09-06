@@ -17,6 +17,7 @@ create table lifts (
     id serial primary key,
     name varchar(255) not null,
     max real not null,
+    is_deleted boolean not null,
     created_at timestamp not null
 );
 
@@ -41,6 +42,6 @@ create table setquantities (
 
 create table workout_lifts (
     id serial primary key,
-    workout_id integer references workouts(id),
+    workout_id integer references workouts(id), 
     lift_id integer references lifts(id)
 );

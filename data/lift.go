@@ -6,6 +6,7 @@ type Lift struct {
 	Id        int
 	Name      string
 	Max       float64
+	IsDeleted bool      `db:"is_deleted"`
 	CreatedAt time.Time `db:"created_at"`
 }
 
@@ -25,24 +26,37 @@ func (lift *Lift) Create() (err error) {
 		return
 	}
 
-	statement := "insert into lifts (name, max, created_at) values ($1, $2, $3) returning id"
+	statement := "insert into lifts (name, max, created_at, is_deleted) values ($1, $2, $3, $4) returning id"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
 		return
 	}
 
 	defer stmt.Close()
-	err = stmt.QueryRow(lift.Name, lift.Max, lift.CreatedAt).Scan(&lift.Id)
+	err = stmt.QueryRow(lift.Name, lift.Max, lift.CreatedAt, lift.IsDeleted).Scan(&lift.Id)
 	return
 }
 
 func GetLift(id int) (lift Lift, err error) {
-	err = db.QueryRowx("select * from lifts where id = $1", id).StructScan(&lift)
+	err = db.QueryRowx("select * from lifts where id = $1 and is_deleted=false", id).StructScan(&lift)
 	return
 }
 
 func GetLifts() (lifts []Lift, err error) {
-	lifts, err = GetWorkoutLifts(Workout{})
+	rows, err := db.Queryx("select * from lifts where is_deleted=false")
+	if err != nil {
+		rows.Close()
+		return
+	}
+
+	for rows.Next() {
+		var lift Lift
+		rows.StructScan(&lift)
+		lifts = append(lifts, lift)
+	}
+
+	rows.Close()
+	err = rows.Err()
 	return
 }
 
@@ -52,6 +66,6 @@ func (lift *Lift) Update() (err error) {
 }
 
 func (lift *Lift) Delete() (err error) {
-	_, err = db.Exec("delete from lifts where id = $1", lift.Id)
+	_, err = db.Exec("update lifts set is_deleted = true where id = $1", lift.Id)
 	return
 }
