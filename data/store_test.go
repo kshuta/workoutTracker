@@ -18,6 +18,7 @@ func TestMain(m *testing.M) {
 }
 
 func setUp() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	var err error
 	if local {
 		err = godotenv.Load(".env.local")
@@ -33,9 +34,8 @@ func setUp() {
 	}
 
 	schema, err := getSQL(initSchemaFile)
-	if err != nil {
-		log.Fatalln("getSQL failed: ", err)
-	}
+
+	check(err)
 	_, err = db.Exec(schema)
 	if err != nil {
 		log.Fatalln("couldn't execute schema: ", err)

@@ -21,6 +21,7 @@ const local = true
 var initSchemaFile = "setup.sql"
 var db *sqlx.DB
 
+// checks if error is nil
 func check(err error) {
 	if err != nil {
 		log.Fatalln(err)
@@ -28,6 +29,7 @@ func check(err error) {
 }
 
 func init() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	var err error
 	if local {
 		err = godotenv.Load(".env.local")
@@ -55,6 +57,10 @@ func getSQL(file string) (schema string, err error) {
 		return
 	}
 	schemaStream, err := ioutil.ReadFile(file)
+	// temp err
+	if err != nil && file == "setup.sql" {
+		schemaStream, err = ioutil.ReadFile("data/setup.sql")
+	}
 	if err != nil {
 		log.Fatalf("error opening %s, %s", file, err)
 	}
