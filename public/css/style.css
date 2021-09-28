@@ -38,3 +38,13 @@ body {
         margin: 30px auto;
     } 
 }
+
+.workout-detail-content {
+    width: 100%;
+}
+
+.workout-detail-lift {
+    margin: 0 auto;
+    width: 80%;
+    text-align: center;
+}

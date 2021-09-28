@@ -79,7 +79,25 @@ func Detail(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		log.Fatalf("error in Detail Handler: %s", err)
 	}
 
-	// sets := data.GetSets(workout.id)
+	lifts, err := data.GetWorkoutLifts(workout)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	liftinfos := make([]data.LiftInfo, 0)
+
+	for _, lift := range lifts {
+		setinfos, err := data.GetSetInfos(workout.Id, lift.Id)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		liftinfos = append(liftinfos, data.LiftInfo{
+			Lift:     lift,
+			Setinfos: setinfos,
+		})
+
+	}
 
 	templ_files := []string{
 		"templates/layout.html",
@@ -95,7 +113,7 @@ func Detail(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		log.Fatal(err)
 	}
 
-	t.ExecuteTemplate(w, "layout", workout)
+	t.ExecuteTemplate(w, "layout", liftinfos)
 
 }
 

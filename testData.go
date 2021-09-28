@@ -34,7 +34,11 @@ func createTestData() (workoutinfos []data.WorkoutInfo, err error) {
 			}
 
 			err = lift.Create()
+			if err != nil {
+				return
+			}
 
+			err = data.CreateLiftWorkout(&workout, &lift)
 			if err != nil {
 				return
 			}
@@ -62,6 +66,10 @@ func createTestData() (workoutinfos []data.WorkoutInfo, err error) {
 				}
 
 				sq.Weight = calcWeight(lift, sq)
+				err = sq.Create()
+				if err != nil {
+					return
+				}
 
 				setinfo := data.SetInfo{
 					Set:      set,

@@ -1,4 +1,15 @@
 {{ define "content" }}
-    <h1>{{ .Name }}</h1>
-    <p>{{ .Date | fdate }}</p>
+    <div class="workout-detail-content">
+    {{ range . }}
+        <div class="workout-detail-lift">
+            <h1>{{ .Lift.Name }}</h1>
+            {{ range .Setinfos }} 
+            <p>
+                <label for="{{ .Set.Id }}">{{ .Quantity.Quantity }} x {{ .Quantity.Weight }} kg</label>
+                <input type="checkbox" id="{{ .Set.Id }}" {{ if .Set.Done }} checked {{ end }} />
+            </p>
+            {{ end }}
+        </div>
+    {{ end }}
+    </div>
 {{ end }}
