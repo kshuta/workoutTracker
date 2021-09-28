@@ -1,6 +1,9 @@
 package data
 
-import "time"
+import (
+	"log"
+	"time"
+)
 
 type Set struct {
 	Id        int
@@ -112,6 +115,9 @@ func (sq *SetQuantity) Delete() (err error) {
 func GetSetInfos(workoutId, liftId int) (setinfos []SetInfo, err error) {
 
 	rows, err := db.Queryx("select * from sets where workout_id=$1 and lift_id=$2", workoutId, liftId)
+	if err != nil {
+		return
+	}
 
 	defer func() {
 		if rows.Err() != nil {
@@ -134,6 +140,7 @@ func GetSetInfos(workoutId, liftId int) (setinfos []SetInfo, err error) {
 			rows.Close()
 			return
 		}
+		log.Printf("Workout id: %d, Lift id: %d", workoutId, liftId)
 
 		setinfos = append(setinfos, SetInfo{Set: set, Quantity: sq})
 	}
