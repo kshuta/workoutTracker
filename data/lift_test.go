@@ -26,16 +26,6 @@ func TestLiftCreate(t *testing.T) {
 		err := lift.Create()
 		liftIsCreated(t, *lift, err)
 	})
-
-	t.Run("create lift with empty CreatedAt (should fail)", func(t *testing.T) {
-		t.Parallel()
-		lift := getTestLift("create test lift name")
-		lift.CreatedAt = time.Time{}
-
-		err := lift.Create()
-		assertError(t, err, ErrLiftMissingField)
-
-	})
 }
 
 func liftIsCreated(t *testing.T, lift Lift, err error) {
@@ -53,6 +43,7 @@ func TestLiftRetrieve(t *testing.T) {
 		t.Parallel()
 		lift := getTestLift("retrieve test lift name")
 		err := lift.Create()
+		assertNoError(t, err)
 		liftIsCreated(t, *lift, err)
 
 		retrievedLift, err := GetLift(lift.Id)
@@ -60,6 +51,11 @@ func TestLiftRetrieve(t *testing.T) {
 		if retrievedLift.Id != lift.Id {
 			t.Errorf("Expected lift with id %d, got lift with id %d", lift.Id, retrievedLift.Id)
 		}
+	})
+
+	// must implement (but I don't know how right now)
+	t.Run("retrieve all lifts", func(t *testing.T) {
+
 	})
 
 	t.Run("retrieve lift that doesn't exist", func(t *testing.T) {

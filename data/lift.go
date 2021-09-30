@@ -21,10 +21,8 @@ func (l LiftErr) Error() string {
 }
 
 func (lift *Lift) Create() (err error) {
-	if lift.CreatedAt.IsZero() {
-		err = ErrLiftMissingField
-		return
-	}
+	lift.CreatedAt = time.Now()
+	lift.IsDeleted = false
 
 	statement := "insert into lifts (name, max, created_at, is_deleted) values ($1, $2, $3, $4) returning id"
 	stmt, err := db.Prepare(statement)
@@ -67,5 +65,11 @@ func (lift *Lift) Update() (err error) {
 
 func (lift *Lift) Delete() (err error) {
 	_, err = db.Exec("update lifts set is_deleted = true where id = $1", lift.Id)
+	return
+}
+
+// function to delete all lifts, only used within tests
+func deleteAllLifts() (err error) {
+	_, err = db.Exec("update lifts set is_deleted = true")
 	return
 }

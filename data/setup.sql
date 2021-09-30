@@ -16,8 +16,8 @@ create table workouts (
 create table lifts (
     id serial primary key,
     name varchar(255) not null,
-    max real not null,
-    is_deleted boolean not null,
+    max real,
+    is_deleted boolean,
     created_at timestamp not null
 );
 

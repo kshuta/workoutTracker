@@ -1,7 +1,6 @@
 package data
 
 import (
-	"log"
 	"time"
 )
 
@@ -140,7 +139,6 @@ func GetSetInfos(workoutId, liftId int) (setinfos []SetInfo, err error) {
 			rows.Close()
 			return
 		}
-		log.Printf("Workout id: %d, Lift id: %d", workoutId, liftId)
 
 		setinfos = append(setinfos, SetInfo{Set: set, Quantity: sq})
 	}
