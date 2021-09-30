@@ -20,6 +20,7 @@ type WorkoutInfo struct {
 	Liftinfos []LiftInfo
 }
 
+// creates intermediate for m-m relation between Lift and Workout
 func CreateLiftWorkout(workout *Workout, lift *Lift) (err error) {
 	if workout.Id == 0 || lift.Id == 0 {
 		return errors.New("Lift or Workout does not exist in database")
@@ -29,6 +30,7 @@ func CreateLiftWorkout(workout *Workout, lift *Lift) (err error) {
 	return
 }
 
+// Gets Lifts that are in the workout given as a parameter
 func GetWorkoutLifts(workout Workout) (lifts []Lift, err error) {
 
 	if workout.Id == 0 {
