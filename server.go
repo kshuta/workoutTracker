@@ -147,7 +147,6 @@ func New(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 	// if it is a post request
 	r.ParseForm()
-	log.Println(r.Form)
 
 	lift := data.Lift{
 		Name: r.Form["liftName"][0],
@@ -157,7 +156,7 @@ func New(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		log.Fatalln("error when creating lift" + err.Error())
 	}
 
-	http.Redirect(w, r, "/", 302)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func fDate(t time.Time) string {
